@@ -4,22 +4,62 @@ import { Head } from '@inertiajs/vue3';
 import TextInput from '@/Components/TextInput.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios';
 
 const produtos=ref([]);
 const produtoForm=ref({
     id:null,
     nomeProduto:null,
-    valorProduto:null,
+    valorProduto: null,
     flagProdutoAtivo:null
 });
+onMounted(()=>{ 
+    listarProdutos();
+})
+const listarProdutos = () => {  
+    axios.get(route('produtos.list'))
+    .then((response)=>{
+        produtos.value = response.data;
+    })
+    .catch((error)=>{
+        alert(error.response.data.message);
+    })
+
+}
+
+
 const cadastrarProduto = (produto) => {
-    produtos.value.push(Object.assign({}, produto));
+    axios.post(route('produtos.create'),{
+        nome: produto.nomeProduto,
+        valor: produto.valorProduto,
+        ativo: produto.flagProdutoAtivo
+    })
+    .then((response) =>{
+        alert(response.data.message);
+       listarProdutos();
+    })
+    .catch((error)=>{
+        alert(error.response.data.message);
+    })
+    produtoForm.value = {
+        id:null,
+        nomeProduto:null,
+        valorProduto:null,
+        flagProdutoAtivo:null     
+    }
+}
+const editarProduto = (produto) => {
+    produtoForm.value = {
+        nomeProduto: produto.nome,
+        valorProduto: produto.valor,
+        flagProdutoAtivo: produto.ativo
+    };
 }
 </script>
 
 <template>
-    <Head title="Loja Pioneiros da Fé" />
+    <Head title="Loja Pioneiros da Fé"/>
 
     <AuthenticatedLayout>
         <template #header>
@@ -62,13 +102,17 @@ const cadastrarProduto = (produto) => {
                             <th class="border">Nome do Produto</th>
                             <th class="border">Valor</th>
                             <th class="border">Ativo</th>
+                            <th class="border"></th>
+
                         </tr>
                         <tr v-for="produto in produtos">
-                            <td class="border"></td>
-                            <td class="border">{{ produto.nomeProduto }}</td>
-                            <td class="border">{{ produto.valorProduto }}</td>
-                            <td class="border">{{ produto.flagProdutoAtivo }}</td>
+                            <td class="border">{{ produto.id }}</td>
+                            <td class="border">{{ produto.nome }}</td>
+                            <td class="border">{{ produto.valor }}</td>
+                            <td class="border">{{ produto.ativo }}</td>
+                            <td class="border"><PrimaryButton @click="editarProduto(produto)">editar</PrimaryButton></td>
                         </tr>
+
                     </table>
                 </div>       
 
