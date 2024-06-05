@@ -6,6 +6,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { ref, onMounted } from 'vue'
 import axios from 'axios';
+import { formatarMoeda } from '@/Utils/NumeroUtils';
 
 const produtos=ref([]);
 const produtoForm=ref({
@@ -18,7 +19,7 @@ onMounted(()=>{
     listarProdutos();
 })
 const listarProdutos = () => {  
-    axios.get(route('produtos.list'))
+    axios.get(route('produtos.index'))
     .then((response)=>{
         produtos.value = response.data;
     })
@@ -30,6 +31,29 @@ const listarProdutos = () => {
 
 
 const cadastrarProduto = (produto) => {
+
+    if(produto.id){
+        axios.put(route('produtos.update', produto.id),{
+            nome: produto.nomeProduto,
+            valor: produto.valorProduto,
+            ativo: produto.flagProdutoAtivo
+        })
+        .then((response) =>{
+            alert(response.data.message);
+            listarProdutos();
+        })
+        .catch((error)=>{
+            alert(error.response.data.message);
+        })
+        produtoForm.value = {
+            id:null,
+            nomeProduto:null,
+            valorProduto:null,
+            flagProdutoAtivo:null     
+        }
+        return;
+    }
+
     axios.post(route('produtos.create'),{
         nome: produto.nomeProduto,
         valor: produto.valorProduto,
@@ -51,6 +75,7 @@ const cadastrarProduto = (produto) => {
 }
 const editarProduto = (produto) => {
     produtoForm.value = {
+        id: produto.id,
         nomeProduto: produto.nome,
         valorProduto: produto.valor,
         flagProdutoAtivo: produto.ativo
@@ -69,9 +94,7 @@ const editarProduto = (produto) => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900"> cadastre seu pedido! </div>
-                       
-
+                    <div class="m-2 font-semibold text-xl text-gray-800 leading-tight">Cadastro de Produtos</div>
                     <div class="m-2">  
                         <div>
                             <InputLabel for="nomeProduto" value="Nome Produto"/>
@@ -91,30 +114,48 @@ const editarProduto = (produto) => {
 
 
                         </div>
-                        <div>
+                        <div class="my-4">
                             <PrimaryButton @click="cadastrarProduto(produtoForm)">Adicionar</PrimaryButton> 
                         </div>
                     </div>
+                    <hr>
                     <div class="m-2">
-                    <table class="w-full"> 
-                        <tr>
-                            <th class="border">id</th>
-                            <th class="border">Nome do Produto</th>
-                            <th class="border">Valor</th>
-                            <th class="border">Ativo</th>
-                            <th class="border"></th>
-
-                        </tr>
-                        <tr v-for="produto in produtos">
-                            <td class="border">{{ produto.id }}</td>
-                            <td class="border">{{ produto.nome }}</td>
-                            <td class="border">{{ produto.valor }}</td>
-                            <td class="border">{{ produto.ativo }}</td>
-                            <td class="border"><PrimaryButton @click="editarProduto(produto)">editar</PrimaryButton></td>
-                        </tr>
-
-                    </table>
-                </div>       
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        id
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
+                                        Nome do Produto
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Valor
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        nowrap>
+                                        Ativo
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr v-for="produto in produtos">
+                                    <td class="px-4 text-sm text-gray-900">{{ produto.id }}</td>
+                                    <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
+                                    <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
+                                    <td class="px-4 text-sm text-gray-900">{{ produto.ativo == "S" ? "SIM" : "NÃO" }}</td>
+                                    <td class="px-4 text-sm text-gray-900"><PrimaryButton @click="editarProduto(produto)">editar</PrimaryButton></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>       
 
                 </div>
 

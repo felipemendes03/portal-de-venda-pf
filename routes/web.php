@@ -28,8 +28,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::post('/api/produtos',[ProdutosController::class, 'create'])->name('produtos.create');
-    Route::get('/api/produtos',[ProdutosController::class, 'list'])->name('produtos.list');
-    Route::put('/api/produtos',[ProdutosController::class, 'update'])->name('produtos.update');
+    Route::get('/api/produtos',[ProdutosController::class, 'index'])->name('produtos.index');
+    Route::put('/api/produtos/{id}',[ProdutosController::class, 'update'])->name('produtos.update');
 });
 
 require __DIR__.'/auth.php';

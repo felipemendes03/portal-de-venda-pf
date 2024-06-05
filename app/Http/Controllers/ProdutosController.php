@@ -14,14 +14,14 @@ class ProdutosController extends Controller
         return response()->json(["message"=>"Produto criado com sucesso!"],201); 
     }
 
-    public function list(Request $request): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return response()->json(Produtos::all()); 
+        return response()->json(Produtos::all(), 200, [], JSON_NUMERIC_CHECK); 
     }
 
-    public function update(Request $request): JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
-        $produto = Produtos::get($request['id']);
+        $produto = Produtos::find($id);
         $produto->update($request->all());
         return response()->json(["message"=>"Produto alterado com sucesso!"]); 
     }
