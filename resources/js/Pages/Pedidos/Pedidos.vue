@@ -1,0 +1,200 @@
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Head } from '@inertiajs/vue3';
+import TextInput from '@/Components/TextInput.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+import { ref, onMounted } from 'vue'
+import axios from 'axios';
+import { formatarMoeda } from '@/Utils/NumeroUtils';
+
+const produtos=ref([]);
+const pedidoForm=ref({
+    produtos:[],
+    formaPagamento: '',
+    nomeCliente: '',
+    valorTotal: 0,
+    valorPago: 0,
+    troco: 0
+});
+const fluxoPedido = ref('PEDIDO');
+
+onMounted(()=>{ 
+    listarProdutos();
+})
+const listarProdutos = () => {  
+    axios.get(route('produtos.index'))
+    .then((response)=>{
+        produtos.value = response.data.filter(produto => produto.ativo == "S");
+    })
+    .catch((error)=>{
+        alert(error.response.data.message);
+    })
+
+}
+
+const calcularTotal = () => {
+    return produtos.value.reduce((total, produto) => total + (produto.valor * (produto.quantidade || 0)), 0);
+}
+
+const fecharPedido = ( produtos ) => {
+    pedidoForm.value.produtos = produtos.filter(produto => produto.quantidade > 0);
+    pedidoForm.value.valorTotal = calcularTotal();
+    pedidoForm.value.valorPago = pedidoForm.value.valorTotal;
+    fluxoPedido.value = 'PAGAMENTO';
+}
+
+</script>
+
+<template>
+    <Head title="Loja Pioneiros da Fé"/>
+
+    <AuthenticatedLayout>
+        <template #header>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Pedidos</h2>
+        </template>
+
+        <div class="py-12">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-2">
+                    <div class="m-2 font-semibold text-xl text-gray-800 leading-tight">Novo pedido</div>
+                    <div v-show="fluxoPedido=='PEDIDO'">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
+                                        Nome do Produto
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Valor
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        nowrap>
+                                        Quantidade
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Subtotal
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr v-for="produto in produtos">
+                                    <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
+                                    <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
+                                    <td class="px-4 text-sm text-gray-900">
+                                        <input type="number" min="0" v-model="produto.quantidade" />
+                                    </td>
+                                    <td class="px-4 text-sm text-gray-900">
+                                        {{ formatarMoeda(produto.valor * produto.quantidade) }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="px-4 text-sm text-gray-900 text-right">Total</td>
+                                    <td class="px-4 text-sm text-gray-900">
+                                        {{ formatarMoeda(calcularTotal()) }}
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div class="my-4 text-end">
+                            <PrimaryButton @click="fecharPedido(produtos)">Fechar Pedido</PrimaryButton>
+                        </div>
+                    </div>
+                    <div v-show="fluxoPedido=='PAGAMENTO'">
+                        <div class="m-2 font-semibold text-xl text-gray-800 leading-tight">Forma de pagamento</div>
+                        
+                        <div>
+                            <span>Resumo do pedido</span>
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
+                                            Nome do Produto
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Valor
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            nowrap>
+                                            Quantidade
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Subtotal
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr v-for="produto in pedidoForm.produtos">
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.quantidade }}</td>
+                                        <td class="px-4 text-sm text-gray-900">
+                                            {{ formatarMoeda(produto.valor * produto.quantidade) }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="px-4 text-sm text-gray-900 text-right">Total</td>
+                                        <td class="px-4 text-sm text-gray-900">
+                                            {{ formatarMoeda(pedidoForm.valorTotal) }}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="m-2 sm:w-1/2">
+                            <div>
+                                <InputLabel for="nomeCliente" value="Nome Cliente*"/>
+                                <TextInput class="w-full" type="text" name="nomeCliente" id="nomeCliente" v-model="pedidoForm.nomeCliente"/>
+                            </div>
+                            <div>
+                                <InputLabel for="formaPagamento" value="Forma de pagamento*"/>
+                                <select class="w-full" name="formaPagamento" id="formaPagamento" v-model="pedidoForm.formaPagamento">
+                                    <option value=""></option>
+                                    <option value="DINHEIRO">Dinheiro</option>
+                                    <option value="CARTAO">Cartão</option>
+                                    <option value="PIX">Pix</option>
+                                    <option value="FIADO">Fiado</option>
+                                </select>
+                            </div>
+                            <div>
+                                <InputLabel for="valorPago" value="Valor pago*"/>
+                                <TextInput class="w-full" type="number" min="0" name="valorPago" id="valorPago" v-model="pedidoForm.valorPago"/>
+                            </div>
+                            <div class="my-4" v-show="pedidoForm.valorPago != pedidoForm.valorTotal">
+                                <span>Troco: {{ formatarMoeda(pedidoForm.valorPago - pedidoForm.valorTotal) }}</span>
+                                <br>
+                                <span v-if="pedidoForm.valorPago < pedidoForm.valorTotal" class="text-red-500">Valor pago menor que o total</span>
+                            </div>
+                            <div>
+                                <InputLabel for="observacao" value="Observação"/>
+                                <TextInput class="w-full" type="text" min="0" name="observacao" id="observacao" v-model="pedidoForm.observacao"/>
+                            </div>
+                            <div class="my-4">
+                                <SecondaryButton @click="fluxoPedido='PEDIDO'" class="mr-2">Voltar</SecondaryButton>
+                                <PrimaryButton @click="finalizarPedido(pedidoForm)"
+                                :disabled="pedidoForm.valorPago < pedidoForm.valorTotal || !pedidoForm.formaPagamento || !pedidoForm.nomeCliente"
+                                :class="{ 'cursor-not-allowed': pedidoForm.valorPago < pedidoForm.valorTotal  || !pedidoForm.formaPagamento || !pedidoForm.nomeCliente,
+                                          'bg-red-800': pedidoForm.valorPago < pedidoForm.valorTotal || !pedidoForm.formaPagamento || !pedidoForm.nomeCliente
+                                 }"
+                                >Finalizar Pedido</PrimaryButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>
