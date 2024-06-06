@@ -14,9 +14,10 @@ const pedidoForm=ref({
     produtos:[],
     formaPagamento: '',
     nomeCliente: '',
-    valorTotal: 0,
-    valorPago: 0,
-    troco: 0
+    valorTotal: '0',
+    valorPago: '0',
+    troco: '0',
+    observacao: ''
 });
 const fluxoPedido = ref('PEDIDO');
 
@@ -31,7 +32,6 @@ const listarProdutos = () => {
     .catch((error)=>{
         alert(error.response.data.message);
     })
-
 }
 
 const calcularTotal = () => {
@@ -43,6 +43,23 @@ const fecharPedido = ( produtos ) => {
     pedidoForm.value.valorTotal = calcularTotal();
     pedidoForm.value.valorPago = pedidoForm.value.valorTotal;
     fluxoPedido.value = 'PAGAMENTO';
+}
+
+const finalizarPedido = ( pedido ) => {
+    let request = {
+        "nm_cliente": pedido.nomeCliente,
+        "tp_pagamento": pedido.formaPagamento,
+        "itens": pedido.produtos
+    }
+
+    axios.post(route('api.pedidos.store'), request)
+    .then( (response) => {
+        alert("Pedido realizado com suceso!");
+        window.location.reload();
+    })
+    .catch((error)=>{
+        alert(error.response.data.message);
+    })
 }
 
 </script>
@@ -171,7 +188,7 @@ const fecharPedido = ( produtos ) => {
                             </div>
                             <div>
                                 <InputLabel for="valorPago" value="Valor pago*"/>
-                                <TextInput class="w-full" type="number" min="0" name="valorPago" id="valorPago" v-model="pedidoForm.valorPago"/>
+                                <input class="w-full" type="number" min="0" name="valorPago" id="valorPago" v-model="pedidoForm.valorPago"/>
                             </div>
                             <div class="my-4" v-show="pedidoForm.valorPago != pedidoForm.valorTotal">
                                 <span>Troco: {{ formatarMoeda(pedidoForm.valorPago - pedidoForm.valorTotal) }}</span>
@@ -180,7 +197,7 @@ const fecharPedido = ( produtos ) => {
                             </div>
                             <div>
                                 <InputLabel for="observacao" value="Observação"/>
-                                <TextInput class="w-full" type="text" min="0" name="observacao" id="observacao" v-model="pedidoForm.observacao"/>
+                                <TextInput class="w-full" type="text" name="observacao" id="observacao" v-model="pedidoForm.observacao"/>
                             </div>
                             <div class="my-4">
                                 <SecondaryButton @click="fluxoPedido='PEDIDO'" class="mr-2">Voltar</SecondaryButton>

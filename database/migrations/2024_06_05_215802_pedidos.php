@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('ds_observacao')->nullable();
             $table->decimal('vl_total', 10, 2);
             $table->enum('tp_status', ['PENDENTE_PAGAMENTO', 'EM_PREPARO', 'AGUARDANDO_RETIRADA', 'ENTREGUE', 'CANCELADO'])->default('PENDENTE_PAGAMENTO');
-            $table->enum('tp_pagamento', ['DINHEIRO', 'CARTAO', 'PIX']);
+            $table->enum('tp_pagamento', ['DINHEIRO', 'CARTAO', 'PIX', 'FIADO']);
             $table->timestamps();
         });
     }
