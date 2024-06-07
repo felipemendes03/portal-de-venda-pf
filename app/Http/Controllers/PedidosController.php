@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Pedido;
 use App\Models\PedidosProduto;
@@ -18,6 +19,9 @@ class PedidosController extends Controller
     public function show($id)
     {
         $pedido = Pedido::find($id);
+        $pedido->dh_pedido = date('Y-m-d H:i:s', Carbon::parse($pedido->created_at)->timestamp);
+        $pedido['itens'] = PedidosProduto::where('id_pedido', $id)
+            ->join('produtos', 'pedidos_produtos.id_produto', '=', 'produtos.id')->select('pedidos_produtos.*', 'produtos.nome as nm_produto')->get();
         return response()->json($pedido);
     }
 

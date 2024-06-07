@@ -24,9 +24,10 @@ Route::get('/produtos', function () {
     return Inertia::render('Produtos/Produtos');
 })->middleware(['auth', 'verified'])->name('produtos');
 
-Route::get('/pedidos', function () {
-    return Inertia::render('Pedidos/Pedidos');
-})->middleware(['auth', 'verified'])->name('pedidos');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/pedidos', function () {return Inertia::render('Pedidos/Pedidos');})->name('pedidos');
+    Route::get('/pedidos/historico', function () {return Inertia::render('Pedidos/PedidosHistorico');})->name('pedidos.historico');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

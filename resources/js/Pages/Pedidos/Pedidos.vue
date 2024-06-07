@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import TextInput from '@/Components/TextInput.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -49,6 +49,7 @@ const finalizarPedido = ( pedido ) => {
     let request = {
         "nm_cliente": pedido.nomeCliente,
         "tp_pagamento": pedido.formaPagamento,
+        "ds_observacao": pedido.observacao,
         "itens": pedido.produtos
     }
 
@@ -75,6 +76,12 @@ const finalizarPedido = ( pedido ) => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-2">
+                    <div class="m-2 font-semibold text-xl text-gray-800 leading-tight">
+                        
+                        <Link :href="route('pedidos.historico')">
+                            <PrimaryButton>Histórico</PrimaryButton>
+                        </Link>
+                    </div>
                     <div class="m-2 font-semibold text-xl text-gray-800 leading-tight">Novo pedido</div>
                     <div v-show="fluxoPedido=='PEDIDO'">
                         <table class="min-w-full divide-y divide-gray-200">
@@ -119,6 +126,7 @@ const finalizarPedido = ( pedido ) => {
                                     </td>
                                 </tr>
                             </tfoot>
+                            
                         </table>
                         <div class="my-4 text-end">
                             <PrimaryButton @click="fecharPedido(produtos)">Fechar Pedido</PrimaryButton>

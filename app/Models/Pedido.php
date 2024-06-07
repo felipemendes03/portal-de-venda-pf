@@ -12,5 +12,6 @@ class Pedido extends Model
         'vl_total',
         'tp_status',
         'tp_pagamento',
+        'ds_observacao',
     ];
 }
