@@ -1,13 +1,24 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
+import axios from 'axios';
 
 const showingNavigationDropdown = ref(false);
+const menu = ref([]);
+
+onMounted(() => {
+    axios.get(route('menu.index'))
+        .then(response => {
+            menu.value = response.data;
+        })
+        .catch(error => console.log('Error:', error));
+});
+
 </script>
 
 <template>
@@ -29,15 +40,11 @@ const showingNavigationDropdown = ref(false);
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                                    Dashboard
-                                </NavLink>
-                                <NavLink :href="route('produtos')" :active="route().current('produtos')">
-                                    Produtos
-                                </NavLink>
-                                <NavLink :href="route('pedidos')" :active="route().current('pedidos')">
-                                    Pedidos
-                                </NavLink>
+                                <template v-for="item in menu">
+                                    <NavLink :href="route(item.rota)" :active="route().current(item.rota)">
+                                        {{ item.nome }}
+                                    </NavLink>
+                                </template>
                             </div>
                         </div>
 
@@ -118,15 +125,11 @@ const showingNavigationDropdown = ref(false);
                     class="sm:hidden"
                 >
                     <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Dashboard
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('produtos')" :active="route().current('produtos')">
-                            Produtos
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('pedidos')" :active="route().current('pedidos')">
-                            Pedidos
-                        </ResponsiveNavLink>
+                        <template v-for="item in menu">
+                            <ResponsiveNavLink :href="route(item.rota)" :active="route().current(item.rota)">
+                                {{ item.nome }}
+                            </ResponsiveNavLink>
+                        </template>
                     </div>
 
                     <!-- Responsive Settings Options -->

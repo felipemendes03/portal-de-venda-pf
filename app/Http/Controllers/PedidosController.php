@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\UsuariosService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Pedido;
@@ -10,10 +11,35 @@ use App\Models\Produtos;
 
 class PedidosController extends Controller
 {
-    public function index()
+
+    public function __construct(Request $request)
     {
-        $pedidos = Pedido::all();
+        $usrSrv = new UsuariosService($request->user()->id_perfil);
+        if (!$usrSrv->verificarPermissao(['pedidos'])) {
+            abort(403, 'Você não tem permissão para acessar essa página. [pedidos]');
+        }
+    }
+    public function index(Request $request)
+    {
+        $status = $request->input("status");
+        $comItens = $request->input("comItens");
+        $orderBy = $request->input("orderBy");
+        if(!$orderBy) $orderBy = 'id';
+        $pedidos = null;
+        if($status){
+            $pedidos = Pedido::where('tp_status', $status)->orderBy($orderBy)->get();
+        }else{
+            $pedidos = Pedido::orderBy($orderBy)->get();
+        }
+        if($comItens){
+            foreach ($pedidos as $pedido) {
+                $pedido['itens'] = PedidosProduto::where('id_pedido', $pedido->id)
+                    ->join('produtos', 'pedidos_produtos.id_produto', '=', 'produtos.id')->select('pedidos_produtos.*', 'produtos.nome as nm_produto')->get();
+            }
+        }
+
         return response()->json($pedidos);
+
     }
 
     public function show($id)

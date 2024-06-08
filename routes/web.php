@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PedidosController;
 use App\Http\Controllers\ProdutosController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Security\SecurityProfileContorller;
+use App\Http\Controllers\Security\SecurityUserContorller;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,13 +23,22 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/produtos', function () {
-    return Inertia::render('Produtos/Produtos');
-})->middleware(['auth', 'verified'])->name('produtos');
-
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/produtos', function () {return Inertia::render('Produtos/Produtos');})->name('produtos');
     Route::get('/pedidos', function () {return Inertia::render('Pedidos/Pedidos');})->name('pedidos');
     Route::get('/pedidos/historico', function () {return Inertia::render('Pedidos/PedidosHistorico');})->name('pedidos.historico');
+    Route::get('/cozinha', function () {return Inertia::render('Cozinha/Pedidos');})->name('cozinha');
+    Route::get('/entrega', function () {return Inertia::render('Entrega/Pedidos');})->name('entrega');
+    
+    Route::get('/security/users', [SecurityUserContorller::class, 'getUsers'])->name('security.users.get');
+    Route::post('/security/users', [SecurityUserContorller::class, 'saveUser'])->name('security.users.post');
+    Route::delete('/security/users/{id}', [SecurityUserContorller::class, 'deleteUser'])->name('security.users.delete');
+    
+    Route::get('/security/profiles', [SecurityProfileContorller::class, 'getProfiles'])->name('security.profiles.get');
+    Route::post('/security/profiles', [SecurityProfileContorller::class, 'saveProfile'])->name('security.profiles.post');
+    Route::delete('/security/profiles/{id}', [SecurityProfileContorller::class, 'deleteProfile'])->name('security.profiles.delete');
+    Route::get('/security/profiles/{idProfile}/permission', [SecurityProfileContorller::class, 'getProfilePermissions'])->name('security.profiles.permissions.get');
+    
 });
 
 Route::middleware('auth')->group(function () {
@@ -38,6 +50,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/produtos', [ProdutosController::class, 'index'])->name('produtos.index');
     Route::put('/api/produtos/{id}', [ProdutosController::class, 'update'])->name('produtos.update');
 
+    Route::get('/api/menu', [MenuController::class, 'index'])->name('menu.index');
+    
+    
     makeCrud(PedidosController::class, '/api/pedidos');
 });
 
