@@ -2,26 +2,34 @@
 
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PedidosController;
+use App\Http\Controllers\PedidosVisitanteController;
 use App\Http\Controllers\ProdutosController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Security\SecurityProfileContorller;
 use App\Http\Controllers\Security\SecurityUserContorller;
-use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    return Inertia::render('Welcome', []);
+})->name('welcome');
+
+
+Route::get('/visitante/pedido/{id}', function (Request $request) {
     return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'pedidoId' => $request->id
     ]);
 });
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/api/pedidos/visitante', [PedidosVisitanteController::class, 'index'])->name('api.pedidos.visitante.index');
+Route::get('/api/pedidos/visitante/{id}', [PedidosVisitanteController::class, 'show'])->name('api.pedidos.visitante.show');
+Route::post('/api/pedidos/visitante', [PedidosVisitanteController::class, 'store'])->name('api.pedidos.visitante.store');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/produtos', function () {return Inertia::render('Produtos/Produtos');})->name('produtos');
