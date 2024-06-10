@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PedidosController;
 use App\Http\Controllers\PedidosVisitanteController;
@@ -32,6 +33,8 @@ Route::post('/api/pedidos/visitante', [PedidosVisitanteController::class, 'store
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/api/dashboard', [DashboardController::class, 'index'])->name('api.dashboard.index');
+
     Route::get('/produtos', function () {return Inertia::render('Produtos/Produtos');})->name('produtos');
     Route::get('/pedidos', function () {return Inertia::render('Pedidos/Pedidos');})->name('pedidos');
     Route::get('/pedidos/historico', function () {return Inertia::render('Pedidos/PedidosHistorico');})->name('pedidos.historico');

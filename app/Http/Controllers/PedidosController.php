@@ -15,10 +15,11 @@ class PedidosController extends Controller
     public function __construct(Request $request)
     {
         $usrSrv = new UsuariosService($request->user()->id_perfil);
-        if (!$usrSrv->verificarPermissao(['pedidos'])) {
-            abort(403, 'Você não tem permissão para acessar essa página. [pedidos]');
+        if (!$usrSrv->verificarPermissao(['pedidos', 'cozinha', 'entrega'])) {
+            abort(403, "Você não tem permissão para acessar essa página. ['pedidos', 'cozinha', 'entrega']");
         }
     }
+
     public function index(Request $request)
     {
         $status = $request->input("status");
@@ -53,6 +54,12 @@ class PedidosController extends Controller
 
     public function store(Request $request)
     {
+
+        $usrSrv = new UsuariosService($request->user()->id_perfil);
+        if (!$usrSrv->verificarPermissao(['pedidos'])) {
+            abort(403, 'Você não tem permissão para acessar essa página. [pedidos]');
+        }
+
         $itens = $request->itens;
         $itensMapeados = [];
         $valorTotal = 0;
@@ -90,8 +97,13 @@ class PedidosController extends Controller
         return response()->json($pedido);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
+        $usrSrv = new UsuariosService($request->user()->id_perfil);
+        if (!$usrSrv->verificarPermissao(['pedidos'])) {
+            abort(403, 'Você não tem permissão para acessar essa página. [pedidos]');
+        }
+        
         $pedido = Pedido::find($id);
         $pedido->delete();
 

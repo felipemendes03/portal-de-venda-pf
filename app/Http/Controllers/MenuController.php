@@ -30,12 +30,12 @@ class MenuController extends Controller
             ],
             [
                 'rota' => 'cozinha',
-                'nome' => 'cozinha',
+                'nome' => 'Cozinha',
                 'permissoes' => ['cozinha']
             ],
             [
                 'rota' => 'entrega',
-                'nome' => 'entrega',
+                'nome' => 'Entrega',
                 'permissoes' => ['entrega']
             ],
             [

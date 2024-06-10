@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ref, onMounted } from 'vue';
 import { formatarMoeda } from '@/Utils/NumeroUtils';
 import { Link } from '@inertiajs/vue3';
+import ContentCopy from 'vue-material-design-icons/ContentCopy.vue';
 
 const props = defineProps({
     pedidoId: {
@@ -96,6 +97,11 @@ const ajustarQuantidade = (produto) => {
         produto.quantidade = 10;
     }
 }
+
+const copiarChavePix = () => {
+    navigator.clipboard.writeText('pioneirosdafeaps@gmail.com');
+}
+
 </script>
 
 <template>
@@ -114,23 +120,22 @@ const ajustarQuantidade = (produto) => {
                 <h2 class="text-center text-white mt-4 text-lg">
                     Serviço de autoatendimento
                 </h2>
-                <div class="justify-center mt-6" v-if="estagioAtual === 0">
+                <div class="justify-center mt-6 bg-[#12188B] p-2" v-if="estagioAtual === 0">
                     <div class="text-white text-center block mt-4">
                         Seu pedido foi realizado com sucesso!
                     </div>
-                    <div class="text-white text-center block mt-4">
+                    <div class="text-white text-center block mt-4 text-lg">
                         Seu número de pedido é: {{ pedidoFeito.id }}
                     </div>
                     <div class="text-white text-center block mt-4" v-if="pedidoFeito.tp_status=='PENDENTE_PAGAMENTO'">
                         Para finalizar seu pedido, efetue o pagamento no valor de {{ formatarMoeda(pedidoFeito.vl_total) }} no caixa. <br>
-                        <div class="mt-4">
-                                <span class="text-lg">Para adiantar, você pode pagar via PIX para a chave
-                                <span class="bg-white text-black p-2 m-2"> pioneirosdafeaps@gmail.com </span>
-                                    e apresentar o comprovante no caixa.
-                                </span> 
+                        <div class="mt-4 text-center">
+                                <span class="text-lg">Para adiantar, você pode pagar via PIX para a chave pix abaixo e apresentar o comprovante no caixa.</span>
+                                <p class="bg-white text-black p-2 m-2 flex flex-row items-center justify-center rounded-lg">
+                                   pioneirosdafeaps@gmail.com 
+                                    <ContentCopy class="ml-2 cursor-pointer" title="Copiar chave" @click="copiarChavePix()"></ContentCopy>
+                                </p>
                         </div>
-                        
-
                     </div>
                     <div v-else class="text-white text-center block mt-4">
                         O status do seu pedido é: {{ pedidoFeito.tp_status }}
@@ -153,12 +158,11 @@ const ajustarQuantidade = (produto) => {
                     <ul>
                         <li v-for="produto in produtos" :key="produto.id">
                             <div class="flex justify-between items-center bg-white text-[#12183B] py-2 mt-4 rounded-lg">
-                                <span class="px-4">{{ produto.nome }}</span>
-                                <span class="px-4">{{ formatarMoeda(produto.valor) }}</span>
-                                <div>
-                                    <button class="m-2 px-4 py-2 rounded-lg bg-[#FFD700]" @click="addProduto(produto, -1)">-</button>
-                                    <input type="number" v-model="produto.quantidade" class="m-2 px-4 py-2 rounded-lg" min="0" max="10" value="0" @change="calcularTotal(produto)">
-                                    <button class="m-2 px-4 py-2 rounded-lg bg-[#FFD700]" @click="addProduto(produto, 1)" >+</button>
+                                <span class="px-4">{{ produto.nome }} - {{ formatarMoeda(produto.valor) }}</span>
+                                <div class="flex justify-between items-center bg-white text-[#12183B] py-2 mt-4 rounded-lg">
+                                    <button class="m-2 px-3 py-2 rounded-lg bg-[#FFD700]" @click="addProduto(produto, -1)">-</button>
+                                    <input type="number" v-model="produto.quantidade" class="rounded-lg" min="0" max="10" value="0" @change="calcularTotal(produto)">
+                                    <button class="m-2 px-3 py-2 rounded-lg bg-[#FFD700]" @click="addProduto(produto, 1)" >+</button>
                                 </div>
                             </div>
                         </li>

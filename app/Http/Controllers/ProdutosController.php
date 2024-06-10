@@ -12,13 +12,17 @@ class ProdutosController extends Controller
     public function __construct(Request $request)
     {
         $usrSrv = new UsuariosService($request->user()->id_perfil);
-        if (!$usrSrv->verificarPermissao(['produtos'])) {
-            abort(403, 'Você não tem permissão para acessar essa página. [produtos]');
+        if (!$usrSrv->verificarPermissao(['produtos','pedidos'])) {
+            abort(403, "Você não tem permissão para acessar essa página. ['produtos','pedidos']");
         }
     }
     
     public function create(Request $request): JsonResponse
     {
+        $usrSrv = new UsuariosService($request->user()->id_perfil);
+        if (!$usrSrv->verificarPermissao(['produtos'])) {
+            abort(403, "Você não tem permissão para acessar essa página. ['produtos']");
+        }
         Produtos::create($request->all());
         return response()->json(["message"=>"Produto criado com sucesso!"],201); 
     }
@@ -30,6 +34,11 @@ class ProdutosController extends Controller
 
     public function update(Request $request, int $id): JsonResponse
     {
+        $usrSrv = new UsuariosService($request->user()->id_perfil);
+        if (!$usrSrv->verificarPermissao(['produtos'])) {
+            abort(403, "Você não tem permissão para acessar essa página. ['produtos']");
+        }
+        
         $produto = Produtos::find($id);
         $produto->update($request->all());
         return response()->json(["message"=>"Produto alterado com sucesso!"]); 

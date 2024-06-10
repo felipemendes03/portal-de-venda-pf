@@ -98,7 +98,8 @@ const editarProduto = (produto) => {
                     <div class="m-2">  
                         <div>
                             <InputLabel for="nomeProduto" value="Nome Produto"/>
-                            <TextInput type="text" name="nomeProduto" id="nomeProduto" v-model="produtoForm.nomeProduto"/> 
+                            <TextInput class="lg:w-1/2 w-full"
+                            type="text" name="nomeProduto" id="nomeProduto" v-model="produtoForm.nomeProduto"/> 
                         </div>
                         <div>
                             <InputLabel for="valorProduto" value="Valor"/>
@@ -115,7 +116,7 @@ const editarProduto = (produto) => {
 
                         </div>
                         <div class="my-4">
-                            <PrimaryButton @click="cadastrarProduto(produtoForm)">Adicionar</PrimaryButton> 
+                            <PrimaryButton @click="cadastrarProduto(produtoForm)">Salvar</PrimaryButton> 
                         </div>
                     </div>
                     <hr>
