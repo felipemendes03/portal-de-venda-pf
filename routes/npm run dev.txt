@@ -1,3 +1,0 @@
-npm run dev
-php artisan serve
-xampp e iniciar o mysql
