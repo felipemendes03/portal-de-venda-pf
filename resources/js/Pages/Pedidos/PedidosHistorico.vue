@@ -171,7 +171,9 @@ const detalhesPedido = (pedido) => {
                            <template v-for="pedido in pedidosFiltrados" :key="pedido.id">
                                 <tr :class="pedido.modificado ? 'bg-yellow-100' : ''">
                                     <td class="px-4 text-sm text-gray-900 border">{{ pedido.id }}</td>
-                                    <td class="px-4 text-sm text-gray-900 border">{{ pedido.nm_cliente }}</td>
+                                    <td class="px-4 text-sm text-gray-900 border">
+                                        <input v-model="pedido.nm_cliente" @change="marcarModificado(pedido)" class="w-full" type="text">
+                                    </td>
                                     <td class="px-4 text-sm text-gray-900 border">{{ formatarMoeda(pedido.vl_total) }}</td>
                                     <td class="px-4 text-sm text-gray-900 border">
                                         <select class="w-full" v-model="pedido.tp_status" @change="marcarModificado(pedido)">

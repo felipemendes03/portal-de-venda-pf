@@ -50,6 +50,7 @@ class PedidosVisitanteController extends Controller
         $pedido->tp_status = 'PENDENTE_PAGAMENTO';
         $pedido->nm_cliente = $request->nome;
         $pedido->tp_pagamento = $request->formaPagamento;
+        $pedido->ds_observacao = $request->observacao;
         $pedido->save();
         foreach ($itensMapeados as $item) {
             $item['id_pedido'] = $pedido->id;

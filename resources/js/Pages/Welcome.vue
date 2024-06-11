@@ -12,6 +12,7 @@ const props = defineProps({
     }
 });
 
+const mostrarAlertaPixCopiado = ref(false);
 const produtos = ref([]);
 const valorTotal = ref(0);
 const pedido = ref({
@@ -99,6 +100,10 @@ const ajustarQuantidade = (produto) => {
 }
 
 const copiarChavePix = () => {
+    mostrarAlertaPixCopiado.value = true;
+    setTimeout(() => {
+        mostrarAlertaPixCopiado.value = false;
+    }, 3000);
     navigator.clipboard.writeText('pioneirosdafeaps@gmail.com');
 }
 
@@ -109,6 +114,11 @@ const copiarChavePix = () => {
     <div class="bg-[#12183B] min-h-screen">
         <div class="flex justify-center pt-6">
             <img src="../Assets/logo45.png" alt="Logo 45 anos Pioneiros da Fé" width="150">
+        </div>
+        <div v-if="mostrarAlertaPixCopiado" class="flex justify-center pt-6 fixed top-0 w-full" style="z-index: 1000;">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                Pix copiado para a área de transferência
+            </div>
         </div>
         <div class="relative w-full max-w-2xl px-6 lg:max-w-7xl mx-auto">
             <main class="mt-6 center">
@@ -148,8 +158,11 @@ const copiarChavePix = () => {
                         </Link>
                     </div>
                 </div>
-                <div class="flex justify-center mt-6" v-if="estagioAtual === 1">
+                <div class="mt-6" v-if="estagioAtual === 1">
                     <input v-model="pedido.nome" type="text" class="w-full px-4 py-2 text-black rounded-lg" placeholder="Digite seu nome"> 
+                    <div class="text-white text-center block mt-4" v-if="pedido.nome.length > 0 && pedido.nome.length < 6">
+                        Falta(m) pelo menos {{ 6 - pedido.nome.length }} caractere(s)
+                    </div>
                 </div>
                 <div v-if="estagioAtual === 2">
                     <span class="text-white text-center block mt-4">
@@ -196,7 +209,7 @@ const copiarChavePix = () => {
                         <span class="px-4">Cartão</span>
                         <input type="radio" name="formaPagamento" v-model="pedido.formaPagamento" value="CARTAO" class="m-2 px-4 py-2 rounded-lg">
                     </div>
-                    <div class="flex justify-between items-center bg-white text-[#12183B] py-2 mt-4 rounded-lg">
+                    <div v-show="false" class="flex justify-between items-center bg-white text-[#12183B] py-2 mt-4 rounded-lg">
                         <span class="px-4">Fiado <span class="text-sm">(Pagar no final da Social)</span></span>
                         <input type="radio" name="formaPagamento" v-model="pedido.formaPagamento" value="FIADO" class="m-2 px-4 py-2 rounded-lg">
                     </div>
