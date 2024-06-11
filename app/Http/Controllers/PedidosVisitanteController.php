@@ -32,6 +32,7 @@ class PedidosVisitanteController extends Controller
         $itens = $request->itens;
         $itensMapeados = [];
         $valorTotal = 0;
+        $produtosInvativos = [];
 
         foreach ($itens as $item) {
             $produto = Produtos::find($item['id']);
@@ -41,7 +42,17 @@ class PedidosVisitanteController extends Controller
                 "vl_produto" => $produto->valor,
                 "vl_total" => $item['quantidade'] * $produto->valor
             ];
+            if($produto->ativo == 'N'){
+                $produtosInvativos[] = $produto->nome;
+            }
             $valorTotal += $itensMapeados[count($itensMapeados)-1]["vl_total"];
+        }
+        
+        if(count($produtosInvativos) > 0){
+            return response()->json([
+                "message" => "Enquanto você fazia o pedido, os seguintes itens não estão mais disponíveis:",
+                "itens" => $produtosInvativos
+            ], 422);
         }
 
         $pedido = new Pedido();

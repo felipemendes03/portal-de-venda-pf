@@ -23,7 +23,7 @@ class DashboardController extends Controller
     {
         return response()->json(
             [
-                "vl_total_vendas" => Pedido::sum('vl_total'),
+                "vl_total_vendas" => Pedido::where('tp_status', '!=', 'CANCELADO')->sum('vl_total'),
                 "nr_pedidos" => Pedido::where('tp_status', '!=', 'CANCELADO')->count(),
                 "nr_aguardando_pagamento" => Pedido::where('tp_status', 'PENDENTE_PAGAMENTO')->count(),
                 "nr_em_preparo" => Pedido::where('tp_status', 'EM_PREPARO')->count(),

@@ -71,10 +71,13 @@ const addProduto = (produto, quantidade) => {
 }
 
 const calcularTotal = (produto) => {
-    ajustarQuantidade(produto);
+    if(produto){
+        ajustarQuantidade(produto);
+    }
+
     let total = 0;
-    produtos.value.forEach(produto => {
-        total += produto.valor * produto.quantidade;
+    produtos.value.forEach(p => {
+        total += p.valor * p.quantidade;
     });
     valorTotal.value = total;
 }
@@ -86,6 +89,16 @@ const enviarPedido = () => {
         document.location.href =  "/visitante/pedido/" + response.data.id;
     })
     .catch(error => {
+        if(error.response.status == 422){
+            let msg = error.response.data.message;
+            error.response.data.itens.forEach(item =>{
+                msg += "\n" + item;
+            })
+            alert(msg);
+            produtos.value = produtos.value.filter(produto => error.response.data.itens.indexOf(produto.nome) < 0);
+            estagioAtual.value = 2;
+            calcularTotal();
+        }
         console.log(error);
     });
 }
