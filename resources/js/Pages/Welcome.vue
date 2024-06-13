@@ -136,7 +136,7 @@ const copiarChavePix = () => {
         <div class="relative w-full max-w-2xl px-6 lg:max-w-7xl mx-auto">
             <main class="mt-6 center">
                 <h1 class="text-center">
-                    <span class="text-4xl font-bold text-white">Social para comeorar o </span>
+                    <span class="text-4xl font-bold text-white">Social para comemorar o </span>
                     <span class="text-4xl font-bold text-[#FFD700]">45º Aniversário </span>
                     <span class="text-4xl font-bold text-white">do Clube Pioneiros da Fé</span>
                 </h1>
