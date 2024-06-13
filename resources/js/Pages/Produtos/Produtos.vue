@@ -15,6 +15,7 @@ const produtoForm=ref({
     valorProduto: null,
     flagProdutoAtivo:null
 });
+const alertas = ref([]);
 onMounted(()=>{ 
     listarProdutos();
 })
@@ -29,7 +30,6 @@ const listarProdutos = () => {
 
 }
 
-
 const cadastrarProduto = (produto) => {
 
     if(produto.id){
@@ -39,7 +39,7 @@ const cadastrarProduto = (produto) => {
             ativo: produto.flagProdutoAtivo
         })
         .then((response) =>{
-            alert(response.data.message);
+            addAlerta(response.data.message);
             listarProdutos();
         })
         .catch((error)=>{
@@ -60,7 +60,7 @@ const cadastrarProduto = (produto) => {
         ativo: produto.flagProdutoAtivo
     })
     .then((response) =>{
-        alert(response.data.message);
+        addAlerta(response.data.message);
        listarProdutos();
     })
     .catch((error)=>{
@@ -81,6 +81,12 @@ const editarProduto = (produto) => {
         flagProdutoAtivo: produto.ativo
     };
 }
+const addAlerta = (mensagem) => {
+    alertas.value.push(mensagem);
+    setTimeout(() => {
+        alertas.value.shift();
+    }, 5000);
+}
 </script>
 
 <template>
@@ -90,7 +96,11 @@ const editarProduto = (produto) => {
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Produtos</h2>
         </template>
-
+        <div v-for="alerta in alertas" class="flex justify-center pt-6 fixed top-0 w-full" style="z-index: 1000;">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                {{ alerta }}
+            </div>
+        </div>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">

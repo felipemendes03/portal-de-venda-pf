@@ -9,23 +9,19 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios';
 import { formatarMoeda } from '@/Utils/NumeroUtils';
 
+
+const alertas = ref([]);
 const produtos=ref([]);
-const pedidoForm=ref({
-    produtos:[],
-    formaPagamento: '',
-    nomeCliente: '',
-    valorTotal: '0',
-    valorPago: '0',
-    troco: '0',
-    observacao: ''
-});
+const pedidoForm=ref({});
 const fluxoPedido = ref('PEDIDO');
 
 onMounted(()=>{ 
     listarProdutos();
+    inicializarPedido();
 })
+
 const listarProdutos = () => {  
-    axios.get(route('produtos.index'))
+    axios.get(route('produtos.index', {'orderBy': 'nome'}))
     .then((response)=>{
         produtos.value = response.data.filter(produto => produto.ativo == "S");
     })
@@ -41,6 +37,10 @@ const calcularTotal = () => {
 const fecharPedido = ( produtos ) => {
     pedidoForm.value.produtos = produtos.filter(produto => produto.quantidade > 0);
     pedidoForm.value.valorTotal = calcularTotal();
+    if(pedidoForm.value.produtos.length == 0){
+        addAlerta("Selecione ao menos um produto para fechar o pedido!");
+        return;
+    }
     pedidoForm.value.valorPago = pedidoForm.value.valorTotal;
     fluxoPedido.value = 'PAGAMENTO';
 }
@@ -55,12 +55,32 @@ const finalizarPedido = ( pedido ) => {
 
     axios.post(route('api.pedidos.store'), request)
     .then( (response) => {
-        alert("Pedido realizado com suceso!");
-        window.location.reload();
+        addAlerta("Pedido realizado com suceso!");
+        listarProdutos();
+        inicializarPedido();
     })
     .catch((error)=>{
         alert(error.response.data.message);
     })
+}
+const inicializarPedido = () => {
+    fluxoPedido.value = 'PEDIDO';
+    pedidoForm.value = {
+        produtos:[],
+        formaPagamento: '',
+        nomeCliente: '',
+        valorTotal: '0',
+        valorPago: '0',
+        troco: '0',
+        observacao: ''
+    }
+}
+
+const addAlerta = (mensagem) => {
+    alertas.value.push(mensagem);
+    setTimeout(() => {
+        alertas.value.shift();
+    }, 5000);
 }
 
 </script>
@@ -72,7 +92,11 @@ const finalizarPedido = ( pedido ) => {
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Pedidos</h2>
         </template>
-
+        <div v-for="alerta in alertas" class="flex justify-center pt-6 fixed top-0 w-full" style="z-index: 1000;">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                {{ alerta }}
+            </div>
+        </div>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-2">
@@ -109,11 +133,11 @@ const finalizarPedido = ( pedido ) => {
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr v-for="produto in produtos">
                                     <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
-                                    <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
+                                    <td class="px-4 text-sm text-gray-900" nowrap>{{ formatarMoeda(produto.valor) }}</td>
                                     <td class="px-4 text-sm text-gray-900">
                                         <input type="number" min="0" v-model="produto.quantidade" />
                                     </td>
-                                    <td class="px-4 text-sm text-gray-900">
+                                    <td class="px-4 text-sm text-gray-900" nowrap>
                                         {{ formatarMoeda(produto.valor * produto.quantidade) }}
                                     </td>
                                 </tr>

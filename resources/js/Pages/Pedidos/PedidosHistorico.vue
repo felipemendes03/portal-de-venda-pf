@@ -7,6 +7,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { formatarMoeda } from '@/Utils/NumeroUtils';
 import { formatarData } from '@/Utils/DataUtils';
 
+const alertas = ref([]);
 const pedidos = ref([]);
 const pedidosFiltrados = ref([]);
 const tipoStatusTodos = ref('');
@@ -107,6 +108,13 @@ const detalhesPedido = (pedido) => {
         pedido.mostrarItens = true;
     }
 }
+
+const alert = (message) => {
+    alertas.value.push(message);
+    setTimeout(() => {
+        alertas.value.shift();
+    }, 5000);
+}
 </script>
 
 <template>
@@ -116,7 +124,11 @@ const detalhesPedido = (pedido) => {
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Pedidos Histórico</h2>
         </template>
-
+        <div v-for="alerta in alertas" class="flex justify-center pt-6 fixed top-0 w-full" style="z-index: 1000;">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                {{ alerta }}
+            </div>
+        </div>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-2">
@@ -200,7 +212,9 @@ const detalhesPedido = (pedido) => {
                                     <td colspan="6" class="text-sm text-gray-900">
                                        <div class="px-2 py-4 mb-6 bg-blue-50 border-2 border-blue-300">
                                             <h3 class="font-semibold text-lg text-gray-800 leading-tight mt-2">Detalhes</h3>
-                                            <p class="text-sm text-gray-800 leading-tight"><span class="font-semibold">Observação: </span>{{ pedido.ds_observacao }}</p>
+                                            <p class="text-sm text-gray-800 leading-tight"><span class="font-semibold">Observação: </span>
+                                                <input type="text" v-model="pedido.ds_observacao" @change="marcarModificado(pedido)" class="w-full">
+                                            </p>
                                             <p class="text-sm text-gray-800 leading-tight font-semibold mt-2">Itens do Pedido:</p>
                                             <p class="text-sm text-gray-800 leading-tight">
                                               <span class="font-semibold">Data Criação: </span>

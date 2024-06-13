@@ -12,7 +12,9 @@ class PedidosVisitanteController extends Controller
 
     public function index(Request $request)
     {
-        $produtos = Produtos::where('ativo', 'S')->get();
+        $produtos = Produtos::where('ativo', 'S')
+        ->orderBy('nome', 'asc')
+        ->get();
         return response()->json([
             'produtos' => $produtos
         ]);

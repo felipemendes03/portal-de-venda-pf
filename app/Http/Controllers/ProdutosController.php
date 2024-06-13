@@ -29,7 +29,9 @@ class ProdutosController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        return response()->json(Produtos::all(), 200, [], JSON_NUMERIC_CHECK); 
+        $orderBy = $request->input("orderBy");
+        if(!$orderBy) $orderBy = 'id';
+        return response()->json(Produtos::orderBy($orderBy)->get(), 200, [], JSON_NUMERIC_CHECK);
     }
 
     public function update(Request $request, int $id): JsonResponse
