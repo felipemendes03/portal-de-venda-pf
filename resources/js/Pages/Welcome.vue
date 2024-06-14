@@ -25,7 +25,7 @@ const pedidoFeito = ref({});
 
 const estagioAtual = ref(1);
 const estagiosPedido = ref([
-    { id: 1, nome: 'Nome', podeProximo: () =>  pedido.value.nome.length > 5},
+    { id: 1, nome: 'Nome', podeProximo: () =>  pedido.value.nome.replace(/\s/g, '').length > 5},
     { id: 2, nome: 'Escolha os itens do seu pedido', podeProximo: () =>  produtos.value.filter(produto => produto.quantidade > 0).length > 0},
     { id: 3, nome: 'Alguma Observação?', podeProximo: () =>  true},
     { id: 4, nome: 'Forma de pagamento', podeProximo: () =>  pedido.value.formaPagamento !== '' },
@@ -120,6 +120,22 @@ const copiarChavePix = () => {
     navigator.clipboard.writeText('pioneirosdafeaps@gmail.com');
 }
 
+const temAcaiNoCopo = () => {
+    return produtos.value.filter(produto => produto.quantidade > 0 && produto.nome.indexOf('Açaí no copo') > -1).length > 0;
+}
+
+const obterAcompanhamentosDoAcai = () => {
+    let acaiNoCopo = produtos.value.filter(produto => produto.quantidade > 0 && produto.nome.indexOf('Açaí no copo') > -1);
+    return acaiNoCopo[0].nome.split(":")[1].replace(" e ",",").split(",");
+}
+
+const addObservacaoRemoverItemDoAcaiNoCopo = (acompanhamento) => {
+    if(pedido.value.observacao.indexOf('Açaí sem') === -1){
+        pedido.value.observacao += ' Açaí';
+    }
+    pedido.value.observacao += ' sem ' + acompanhamento.trim() + ';';
+}
+
 </script>
 
 <template>
@@ -173,8 +189,8 @@ const copiarChavePix = () => {
                 </div>
                 <div class="mt-6" v-if="estagioAtual === 1">
                     <input v-model="pedido.nome" type="text" class="w-full px-4 py-2 text-black rounded-lg" placeholder="Digite seu nome"> 
-                    <div class="text-white text-center block mt-4" v-if="pedido.nome.length > 0 && pedido.nome.length < 6">
-                        Falta(m) pelo menos {{ 6 - pedido.nome.length }} caractere(s)
+                    <div class="text-white text-center block mt-4" v-if="pedido.nome.replace(/\s/g, '').length > 0 && pedido.nome.replace(/\s/g, '').length < 6">
+                        Falta(m) pelo menos mais {{ 6 - pedido.nome.replace(/\s/g, '').length }} letra(s)
                     </div>
                 </div>
                 <div v-if="estagioAtual === 2">
@@ -204,6 +220,15 @@ const copiarChavePix = () => {
                     <span class="text-white text-center block mt-4">
                         Alguma Observação?
                     </span>
+                    <div v-if="temAcaiNoCopo()">
+                        <div v-for="acompanhamentoAcai in obterAcompanhamentosDoAcai()">
+                            <button v-if="pedido.observacao.indexOf(acompanhamentoAcai) === -1"
+                             @click="addObservacaoRemoverItemDoAcaiNoCopo(acompanhamentoAcai)" 
+                                class="w-full bg-blue-200 text-[#12183B] rounded-lg p-2 mb-1">
+                                Açaí sem {{ acompanhamentoAcai }}
+                            </button>
+                        </div>
+                    </div>
                     <textarea v-model="pedido.observacao" class="w-full px-4 py-2 text-black rounded-lg" placeholder="Digite aqui sua observação"></textarea>
                 </div>
                 <div v-else-if="estagioAtual === 4">

@@ -4,10 +4,13 @@ import axios from 'axios';
 import { Head } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue'
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Alert from '@/Components/Alert.vue';
 import { formatarMoeda } from '@/Utils/NumeroUtils';
 import { formatarData } from '@/Utils/DataUtils';
 
-const alertas = ref([]);
+const alertObj = ref({
+     alertas: []
+});
 const pedidos = ref([]);
 const pedidosFiltrados = ref([]);
 const tipoStatusTodos = ref('');
@@ -43,7 +46,7 @@ const listarPedidos = () => {
         pedidosFiltrados.value = pedidos.value;
     })
     .catch((error)=>{
-        alert(error.response.data.message);
+        addAlerta(error.response.data.message, 'error');
     })
 }
 
@@ -78,12 +81,12 @@ const salvarAlteracoes = () => {
         .then((response)=>{
             totalAlterados++;
             if(totalAlterados == pedidosAlterados.length){
-                alert('Pedidos atualizados com sucesso!');
+                addAlerta('Pedidos atualizados com sucesso!');
                 listarPedidos();
             }
         })
         .catch((error)=>{
-            alert(error.response.data.message);
+            addAlerta(error.response.data.message, 'error');
         })
     });
 }
@@ -102,17 +105,18 @@ const detalhesPedido = (pedido) => {
 
         })
         .catch((error)=>{
-            alert(error.response.data.message);
+            addAlerta(error.response.data.message, 'error');
         })
     }else{
         pedido.mostrarItens = true;
     }
 }
 
-const alert = (message) => {
-    alertas.value.push(message);
+const addAlerta = (mensagem, tipo) => {
+    if(tipo == undefined) tipo = 'success';
+    alertObj.value.alertas.push({mensagem, tipo});
     setTimeout(() => {
-        alertas.value.shift();
+        alertObj.value.alertas.shift();
     }, 5000);
 }
 </script>
@@ -124,11 +128,7 @@ const alert = (message) => {
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Pedidos Histórico</h2>
         </template>
-        <div v-for="alerta in alertas" class="flex justify-center pt-6 fixed top-0 w-full" style="z-index: 1000;">
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                {{ alerta }}
-            </div>
-        </div>
+        <Alert :alertaObj="alertObj" />
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-2">

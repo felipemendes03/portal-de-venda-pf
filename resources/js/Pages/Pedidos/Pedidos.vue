@@ -5,19 +5,23 @@ import TextInput from '@/Components/TextInput.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
+import Alert from '@/Components/Alert.vue';
 import { ref, onMounted } from 'vue'
 import axios from 'axios';
 import { formatarMoeda } from '@/Utils/NumeroUtils';
 
 
-const alertas = ref([]);
+const alertObj = ref({
+     alertas: []
+});
+
 const produtos=ref([]);
 const pedidoForm=ref({});
 const fluxoPedido = ref('PEDIDO');
 
 onMounted(()=>{ 
-    listarProdutos();
     inicializarPedido();
+    listarProdutos();
 })
 
 const listarProdutos = () => {  
@@ -26,7 +30,7 @@ const listarProdutos = () => {
         produtos.value = response.data.filter(produto => produto.ativo == "S");
     })
     .catch((error)=>{
-        alert(error.response.data.message);
+        addAlerta(error.response.data.message, "error");
     })
 }
 
@@ -38,7 +42,7 @@ const fecharPedido = ( produtos ) => {
     pedidoForm.value.produtos = produtos.filter(produto => produto.quantidade > 0);
     pedidoForm.value.valorTotal = calcularTotal();
     if(pedidoForm.value.produtos.length == 0){
-        addAlerta("Selecione ao menos um produto para fechar o pedido!");
+        addAlerta("Selecione ao menos um produto para fechar o pedido!", "warning");
         return;
     }
     pedidoForm.value.valorPago = pedidoForm.value.valorTotal;
@@ -76,10 +80,11 @@ const inicializarPedido = () => {
     }
 }
 
-const addAlerta = (mensagem) => {
-    alertas.value.push(mensagem);
+const addAlerta = (mensagem, tipo) => {
+    if(tipo == undefined) tipo = 'success';
+    alertObj.value.alertas.push({mensagem, tipo});
     setTimeout(() => {
-        alertas.value.shift();
+        alertObj.value.alertas.shift();
     }, 5000);
 }
 
@@ -92,11 +97,7 @@ const addAlerta = (mensagem) => {
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Pedidos</h2>
         </template>
-        <div v-for="alerta in alertas" class="flex justify-center pt-6 fixed top-0 w-full" style="z-index: 1000;">
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                {{ alerta }}
-            </div>
-        </div>
+        <Alert :alertaObj="alertObj" />
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-2">
@@ -206,7 +207,7 @@ const addAlerta = (mensagem) => {
                         <div class="m-2 sm:w-1/2">
                             <div>
                                 <InputLabel for="nomeCliente" value="Nome Cliente*"/>
-                                <TextInput class="w-full" type="text" name="nomeCliente" id="nomeCliente" v-model="pedidoForm.nomeCliente"/>
+                                <input class="w-full" type="text" name="nomeCliente" id="nomeCliente" v-model="pedidoForm.nomeCliente"/>
                             </div>
                             <div>
                                 <InputLabel for="formaPagamento" value="Forma de pagamento*"/>
@@ -229,7 +230,7 @@ const addAlerta = (mensagem) => {
                             </div>
                             <div>
                                 <InputLabel for="observacao" value="Observação"/>
-                                <TextInput class="w-full" type="text" name="observacao" id="observacao" v-model="pedidoForm.observacao"/>
+                                <input class="w-full" type="text" name="observacao" id="observacao" v-model="pedidoForm.observacao"/>
                             </div>
                             <div class="my-4">
                                 <SecondaryButton @click="fluxoPedido='PEDIDO'" class="mr-2">Voltar</SecondaryButton>
