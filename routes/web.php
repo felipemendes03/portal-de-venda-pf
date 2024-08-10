@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CadastroClienteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PedidosController;
@@ -31,6 +32,10 @@ Route::get('/api/pedidos/visitante', [PedidosVisitanteController::class, 'index'
 Route::get('/api/pedidos/visitante/{id}', [PedidosVisitanteController::class, 'show'])->name('api.pedidos.visitante.show');
 Route::post('/api/pedidos/visitante', [PedidosVisitanteController::class, 'store'])->name('api.pedidos.visitante.store');
 
+Route::post('/api/clientes/login', [CadastroClienteController::class, 'login'])->name('api.clientes.login');
+Route::post('/api/clientes/verificar', [CadastroClienteController::class, 'verificarSeExiste'])->name('api.clientes.verificar-castrado');
+Route::get('/api/clientes', [CadastroClienteController::class, 'show'])->name('api.clientes.show');
+Route::post('/api/clientes', [CadastroClienteController::class, 'store'])->name('api.clientes.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/dashboard', [DashboardController::class, 'index'])->name('api.dashboard.index');
