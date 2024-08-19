@@ -5,6 +5,7 @@ import { ref, onMounted } from 'vue';
 import { formatarMoeda } from '@/Utils/NumeroUtils';
 import { Link } from '@inertiajs/vue3';
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue';
+import TopMenu from './AreaCliente/TopMenu.vue';
 
 const props = defineProps({
     pedidoId: {
@@ -13,8 +14,11 @@ const props = defineProps({
 });
 
 const mostrarAlertaPixCopiado = ref(false);
+const mostrarAlertaErro = ref(false);
+const mensagemDeErro =  ref('');
 const produtos = ref([]);
 const valorTotal = ref(0);
+const clienteLogado = ref({})
 const pedido = ref({
     nome: '',
     observacao: '',
@@ -37,6 +41,7 @@ const showPassword = ref(false);
 const ESTAGIO_INICIO = 1;
 const ESTAGIO_VALIDAR_CADASTRO = 1.1;
 const ESTAGIO_CADASTRO = 1.2;
+const ESTAGIO_LOGIN = 1.3;
 const ESTAGIO_NOME = 2;
 const ESTAGIO_PRODUTOS = 3;
 const ESTAGIO_OBSERVACAO = 4;
@@ -44,11 +49,11 @@ const ESTAGIO_FORMA_PAGAMENTO = 5;
 const ESTAGIO_REVISAO = 6;
 
 const estagiosPedido = ref([
-    { id: ESTAGIO_NOME, nome: 'Nome', podeProximo: () =>  pedido.value.nome.replace(/\s/g, '').length > 5},
-    { id: ESTAGIO_PRODUTOS, nome: 'Escolha os itens do seu pedido', podeProximo: () =>  produtos.value.filter(produto => produto.quantidade > 0).length > 0},
-    { id: ESTAGIO_OBSERVACAO, nome: 'Alguma Observação?', podeProximo: () =>  true},
-    { id: ESTAGIO_FORMA_PAGAMENTO, nome: 'Forma de pagamento', podeProximo: () =>  pedido.value.formaPagamento !== '' },
-    { id: ESTAGIO_REVISAO, nome: 'Revise seu pedido', podeProximo: () =>  true},
+    { id: ESTAGIO_NOME, nome: 'Nome', podeProximo: () =>  pedido.value.nome.replace(/\s/g, '').length > 5, podeVoltar: () =>  true},
+    { id: ESTAGIO_PRODUTOS, nome: 'Escolha os itens do seu pedido', podeProximo: () =>  produtos.value.filter(produto => produto.quantidade > 0).length > 0, podeVoltar: () =>  !clienteLogado.value.nome },
+    { id: ESTAGIO_OBSERVACAO, nome: 'Alguma Observação?', podeProximo: () =>  true, podeVoltar: () =>  true},
+    { id: ESTAGIO_FORMA_PAGAMENTO, nome: 'Forma de pagamento', podeProximo: () =>  pedido.value.formaPagamento !== '' , podeVoltar: () =>  true},
+    { id: ESTAGIO_REVISAO, nome: 'Revise seu pedido', podeProximo: () =>  true, podeVoltar: () =>  true},
 ]);
 
 const podeCadastro = () => {
@@ -69,6 +74,35 @@ const efetuarCadastro = () => {
         console.log(error);
     });
 }
+
+const efetuarLogin = () => {
+    axios.post(route('api.clientes.login'), cadastro.value)
+    .then(response => {
+        let token = response.data.token;
+        let tokenType = response.data.token_type;
+        localStorage.setItem('token', tokenType + ' ' + token);
+        window.location.reload();
+    })
+    .catch(error => {
+        mostrarAlertaErro.value = true;
+        if(error.response.status == 401){
+            mostrarMensagemErro(error.response.data.error);
+        }else{
+            mostrarMensagemErro("Houve um erro ao tentar efetuar o login.");
+        }
+        console.log(error);
+    });
+}
+
+const mostrarMensagemErro = (mensagem) => {
+    mostrarAlertaErro.value = true;
+    mensagemDeErro.value = mensagem;
+    setTimeout(() => {
+        mostrarAlertaErro.value = false;
+        mensagemDeErro.value = '';
+    }, 3000);
+}
+
 const navegarEstagio = (id) => {
     if(estagioAtual.value > id){
         id = Math.ceil(id);
@@ -88,7 +122,8 @@ onMounted(() => {
         }
     })
     .then(response => {
-        // Handle the response
+        estagioAtual.value = ESTAGIO_PRODUTOS;
+        clienteLogado.value = response.data;
     })
     .catch(error => {
         console.log(error);
@@ -141,8 +176,16 @@ const calcularTotal = (produto) => {
 
 const enviarPedido = () => {
     pedido.value.itens = produtos.value.filter(produto => produto.quantidade > 0);
-    axios.post(route('api.pedidos.visitante.store'), pedido.value)
-    .then(response => {
+    axios.post(route('api.pedidos.visitante.store'),
+        {
+            pedido: pedido.value
+        },
+        {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        }
+    ).then(response => {
         document.location.href =  "/visitante/pedido/" + response.data.id;
     })
     .catch(error => {
@@ -151,10 +194,12 @@ const enviarPedido = () => {
             error.response.data.itens.forEach(item =>{
                 msg += "\n" + item;
             })
-            alert(msg);
+            mostrarMensagemErro(msg);
             produtos.value = produtos.value.filter(produto => error.response.data.itens.indexOf(produto.nome) < 0);
             estagioAtual.value = 2;
             calcularTotal();
+        } else {
+            mostrarMensagemErro("Houve um erro ao tentar enviar o pedido.");
         }
         console.log(error);
     });
@@ -196,7 +241,7 @@ const addObservacaoRemoverItemDoAcaiNoCopo = (acompanhamento) => {
 const avancarCadastro = () => {
     verificarSeCadastroExiste().then(existe => {
         if(existe){
-            alert('Já existe um cadastro com esse CPF');
+            estagioAtual.value = ESTAGIO_LOGIN;
         }else{
             estagioAtual.value = ESTAGIO_CADASTRO;
         }
@@ -245,8 +290,9 @@ const verificarSeCadastroExiste = () => {
 
 <template>
     <Head title="Welcome" />
+    <TopMenu :clienteLogado="clienteLogado" v-if="clienteLogado.nome"/>
     <div class="bg-[#12183B] min-h-screen">
-        <div class="flex justify-center pt-6">
+        <div class="flex justify-center pt-6" style="padding-top: 40px;">
             <img src="../Assets/logo45.png" alt="Logo 45 anos Pioneiros da Fé" width="150">
         </div>
         <div v-if="mostrarAlertaPixCopiado" class="flex justify-center pt-6 fixed top-0 w-full" style="z-index: 1000;">
@@ -254,12 +300,16 @@ const verificarSeCadastroExiste = () => {
                 Pix copiado para a área de transferência
             </div>
         </div>
+        <div v-if="mostrarAlertaErro" class="flex justify-center pt-6 fixed top-0 w-full" style="z-index: 1000;">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                {{ mensagemDeErro }}
+            </div>
+        </div>
         <div class="relative w-full max-w-2xl px-6 lg:max-w-7xl mx-auto">
             <main class="mt-6 center">
                 <h1 class="text-center">
                     <span class="text-4xl font-bold text-white">Social do Clube Pioneiros da Fé</span>
                 </h1>
-                {{  estagioAtual  }}
                 <h2 class="text-center text-white mt-4 text-lg">
                     Serviço de autoatendimento
                 </h2>
@@ -303,7 +353,7 @@ const verificarSeCadastroExiste = () => {
                         Fazer cadastro e acompanhar pedidos
                     </button>                    
                 </div>
-                <div class="mt-6" v-if="estagioAtual === ESTAGIO_CADASTRO || estagioAtual === ESTAGIO_VALIDAR_CADASTRO">
+                <div class="mt-6" v-if="estagioAtual > 1 && estagioAtual < 2">
                     <span class="text-white text-center block mt-4 text-lg">
                         Faça seu cadastro para acompanhar todos os seus pedidos
                     </span>
@@ -360,9 +410,39 @@ const verificarSeCadastroExiste = () => {
                         </div>
                         <button class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg"
                             v-bind:class="{ 'cursor-not-allowed bg-[#ccc]': !podeCadastro() }"
-                            @click="efetuarCadastro(ESTAGIO_NOME)" 
+                            @click="efetuarCadastro()" 
                             :disabled="!podeCadastro()">
                             Cadastrar
+                        </button>
+                    </div>
+                    <div v-if="estagioAtual === ESTAGIO_LOGIN">
+                        <span class="text-white block">CPF: {{ cadastro.cpf }}</span>
+                        <span class="text-white">Senha</span>
+                        <div class="relative w-full">
+                            <input :type="showPassword ? 'text' : 'password'" 
+                                v-model="cadastro.senha" 
+                                class="w-full px-4 py-2 text-black rounded-lg" 
+                                placeholder="Digite sua senha">
+                            <button type="button" 
+                                    @click="togglePasswordVisibility" 
+                                    class="absolute inset-y-0 right-0 px-4 py-2">
+                                    <div v-if="showPassword">
+                                        <i class="fa fa-eye-slash" ></i>
+                                    </div>
+                                    <div v-else="!showPassword">
+                                        <i class="fa fa-eye" ></i> 
+                                    </div>
+                            </button>
+                        </div>
+                        <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="cadastro.senha.replace(/\s/g, '').length > 0 && cadastro.senha.replace(/\s/g, '').length < 6">
+                            A senha deve ter pelo menos 6 caracteres
+                        </div>
+
+                        <button class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg"
+                            v-bind:class="{ 'cursor-not-allowed bg-[#ccc]': cadastro.senha.replace(/\s/g, '').length < 6 }"
+                            @click="efetuarLogin()" 
+                            :disabled="cadastro.senha.replace(/\s/g, '').length < 6">
+                            Entrar
                         </button>
                     </div>
                 </div>
@@ -467,7 +547,7 @@ const verificarSeCadastroExiste = () => {
                     </ul>
                 </div>
                 <div>
-                    <button @click="navegarEstagio(estagioAtual-1)" class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg" v-if="estagioAtual > 1">Voltar</button>
+                    <button @click="navegarEstagio(estagioAtual-1)" class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg" v-if="estagiosPedido.filter(e => e.id === estagioAtual && e.podeVoltar() ).length > 0">Voltar</button>
                     <button @click="navegarEstagio(estagioAtual+1)" class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg mb-6" v-if="estagioAtual < (estagiosPedido.length) && estagiosPedido.filter(e => e.id === estagioAtual && e.podeProximo() ).length > 0">Avançar</button>
                     <button class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg mb-6" v-if="estagioAtual === (estagiosPedido.length)" @click="enviarPedido">Enviar Pedido</button>
                 </div>

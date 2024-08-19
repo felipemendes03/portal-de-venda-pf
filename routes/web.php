@@ -24,13 +24,21 @@ Route::get('/visitante/pedido/{id}', function (Request $request) {
     ]);
 });
 
+Route::get('/meus-pedidos', function () {
+    return Inertia::render('AreaCliente/HistoricoPedidos', [
+        
+    ]);
+})->name('meus-pedidos');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/api/pedidos/visitante', [PedidosVisitanteController::class, 'index'])->name('api.pedidos.visitante.index');
+Route::get('/api/pedidos/visitante/historico', [PedidosVisitanteController::class, 'getHistorico'])->name('api.pedidos.visitante.historico');
 Route::get('/api/pedidos/visitante/{id}', [PedidosVisitanteController::class, 'show'])->name('api.pedidos.visitante.show');
 Route::post('/api/pedidos/visitante', [PedidosVisitanteController::class, 'store'])->name('api.pedidos.visitante.store');
+
 
 Route::post('/api/clientes/login', [CadastroClienteController::class, 'login'])->name('api.clientes.login');
 Route::post('/api/clientes/verificar', [CadastroClienteController::class, 'verificarSeExiste'])->name('api.clientes.verificar-castrado');

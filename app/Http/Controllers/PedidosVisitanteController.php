@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CadastroCliente;
 use App\Models\Pedido;
 use App\Models\PedidosProduto;
+use App\Services\UsuariosDeClientesService;
 use Illuminate\Http\Request;
 use App\Models\Produtos;
 
@@ -29,9 +31,22 @@ class PedidosVisitanteController extends Controller
         return response()->json($pedido);
     }
 
+    public function getHistorico(Request $request)
+    {
+        $cadastroCliente = $this->getCadastroCliente($request->header('Authorization'));
+        $pedidos = Pedido::select('pedidos.*', \DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') as created_at_formatted"))
+        ->where('id_cadastro_cliente', $cadastroCliente->id)
+        ->orderBy('created_at', 'desc')
+        ->get();
+            
+        return response()->json(["historico" => $pedidos]);
+    }
+
     public function store(Request $request)
     {
-        $itens = $request->itens;
+        $cadastroCliente = $this->getCadastroCliente($request->header('Authorization'));
+        $pedidoRequest = $request->all()['pedido'];
+        $itens = $pedidoRequest['itens'];
         $itensMapeados = [];
         $valorTotal = 0;
         $produtosInvativos = [];
@@ -58,12 +73,17 @@ class PedidosVisitanteController extends Controller
         }
 
         $pedido = new Pedido();
-        $pedido->fill($request->all());
+        $pedido->fill($pedidoRequest);
         $pedido->vl_total = $valorTotal;
         $pedido->tp_status = 'PENDENTE_PAGAMENTO';
-        $pedido->nm_cliente = $request->nome;
-        $pedido->tp_pagamento = $request->formaPagamento;
-        $pedido->ds_observacao = $request->observacao;
+        if($cadastroCliente){
+            $pedido->id_cadastro_cliente = $cadastroCliente->id;
+            $pedido->nm_cliente = $cadastroCliente->nome;
+        }else{
+            $pedido->nm_cliente = $pedidoRequest['nome'];
+        }
+        $pedido->tp_pagamento = $pedidoRequest['formaPagamento'];
+        $pedido->ds_observacao = $pedidoRequest['observacao'];
         $pedido->save();
         foreach ($itensMapeados as $item) {
             $item['id_pedido'] = $pedido->id;
@@ -73,5 +93,13 @@ class PedidosVisitanteController extends Controller
         return response()->json($pedido, 201);
     }
 
+    private function getCadastroCliente(String $jwt) : CadastroCliente|null{
+        if(!$jwt){
+            return null;
+        }
+        $jwt = str_replace('Bearer ', '', $jwt);
+        $clienteId = UsuariosDeClientesService::validarJwt($jwt);
+        return CadastroCliente::find($clienteId);
+    }
    
 }
