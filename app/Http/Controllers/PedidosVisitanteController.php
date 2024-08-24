@@ -38,7 +38,12 @@ class PedidosVisitanteController extends Controller
         ->where('id_cadastro_cliente', $cadastroCliente->id)
         ->orderBy('created_at', 'desc')
         ->get();
-            
+
+        foreach ($pedidos as $pedido) {
+            $pedido['itens'] = PedidosProduto::where('id_pedido', $pedido->id)
+                ->join('produtos', 'pedidos_produtos.id_produto', '=', 'produtos.id')->select('pedidos_produtos.*', 'produtos.nome as nm_produto')->get();
+        }
+        
         return response()->json(["historico" => $pedidos]);
     }
 

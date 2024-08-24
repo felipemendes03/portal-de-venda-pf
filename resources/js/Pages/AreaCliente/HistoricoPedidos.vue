@@ -1,4 +1,5 @@
 <script setup>
+import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
 import TopMenu from './TopMenu.vue';
 import { ref, onMounted } from 'vue';
@@ -28,6 +29,7 @@ onMounted(() => {
 
 </script>
 <template>
+    <Head title="Meus pedidos" />
     <TopMenu :clienteLogado="clienteLogado" v-if="clienteLogado.nome"/>
     <div class="bg-[#12183B] min-h-screen">
         <div class="flex justify-center pt-6" style="padding-top: 40px;">
@@ -39,27 +41,62 @@ onMounted(() => {
         <h2 class="text-center text-white mt-4 text-lg">
             Meus pedidos
         </h2>
-        <!--
-        { "historico": [ { "id": 19, "id_cadastro_cliente": 1, "cadastro_cliente": null, "nm_cliente": "Danilo", "ds_observacao": null, "vl_total": "10.50", "tp_status": "PENDENTE_PAGAMENTO", "tp_pagamento": "CARTAO", "created_at": "2024-08-19T11:22:49.000000Z", "updated_at": "2024-08-19T11:22:49.000000Z" } ] }
-        -->
         <div class="flex justify-center mt-4">
-            <div class="w-1/2">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="text-left">Data</th>
-                            <th class="text-left">Valor</th>
-                            <th class="text-left">Status</th>
-                            <th class="text-left">Pagamento</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-gray-200">
-                        <tr v-for="pedido in historicoPedidos.historico" :key="pedido.id">
-                            <td>{{ formatarData(pedido.created_at_formatted) }}</td>
-                            <td>{{ formatarMoeda(pedido.vl_total) }}</td>
-                            <td>{{ pedido.tp_status }}</td>
-                            <td>{{ pedido.tp_pagamento }}</td>
-                        </tr>
+            <div>
+                <table class="min-w-full divide-y divide-gray-200" style="padding: 10px;">
+                     <tbody>
+                        <template v-for="pedido in historicoPedidos.historico" :key="pedido.id">
+                            <tr>
+                                <td class="text-sm text-gray-900">
+                                    <div class="px-2 py-4 mb-6 bg-[#fff] border-2 border-blue-300">
+                                        <p class="text-sm text-gray-800 leading-tight">
+                                            <span class="font-semibold">Data: {{ formatarData(pedido.created_at_formatted) }}</span>
+                                        </p>
+                                        <p class="text-sm text-gray-800 leading-tight">
+                                            <span class="font-semibold">Valor: {{ formatarMoeda(pedido.vl_total)  }}</span>
+                                        </p>
+                                        <p class="text-sm text-gray-800 leading-tight">
+                                            <span class="font-semibold">Status: {{ pedido.tp_status }}</span>
+                                        </p>
+                                        <p class="text-sm text-gray-800 leading-tight">
+                                            <span class="font-semibold">Forma Pagamento: {{ pedido.tp_pagamento }}</span>
+                                        </p>
+                                        <p class="text-sm text-gray-800 leading-tight">
+                                            <span class="font-semibold">Observação: {{ pedido.ds_observacao }}</span>
+                                        </p>
+                                        <p class="text-sm text-gray-800 leading-tight font-semibold mt-2">Itens do Pedido:</p>
+                                        
+                                        <table class="min-w-full divide-y divide-gray-200 my-2">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col" class="border text-left text-xs font-medium uppercase tracking-wider">
+                                                        Produto
+                                                    </th>
+                                                    <th scope="col" class="border text-left text-xs font-medium uppercase tracking-wider">
+                                                        Quantidade
+                                                    </th>
+                                                    <th scope="col" class="border text-left text-xs font-medium uppercase tracking-wider">
+                                                        Valor Unitário
+                                                    </th>
+                                                    <th scope="col" class="border text-left text-xs font-medium uppercase tracking-wider">
+                                                        Valor Total
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="item in pedido.itens" :key="item.id">
+                                                    <td class="px-4 text-sm text-gray-900 border"> {{ item.nm_produto }} </td>
+                                                    <td class="px-4 text-sm text-gray-900 border">{{ item.qt_produto }}</td>
+                                                    <td class="px-4 text-sm text-gray-900 border">{{ formatarMoeda(item.vl_produto) }}</td>
+                                                    <td class="px-4 text-sm text-gray-900 border">{{ formatarMoeda(item.vl_total) }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        
                     </tbody>
                 </table>
             </div>

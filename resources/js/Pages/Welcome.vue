@@ -314,10 +314,10 @@ const verificarSeCadastroExiste = () => {
                     Serviço de autoatendimento
                 </h2>
                 <div class="justify-center mt-6 bg-[#12188B] p-2" v-if="estagioAtual === 0">
-                    <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg">
+                    <div class="text-center block mt-1  mt-1 bg-blue-100 p-2 rounded-lg">
                         Seu pedido foi realizado com sucesso!
                     </div>
-                    <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg text-lg">
+                    <div class="text-center block mt-1  mt-1 bg-blue-100 p-2 rounded-lg text-lg">
                         Seu número de pedido é: {{ pedidoFeito.id }}
                     </div>
                     <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="pedidoFeito.tp_status=='PENDENTE_PAGAMENTO'">
@@ -334,9 +334,14 @@ const verificarSeCadastroExiste = () => {
                         O status do seu pedido é: {{ pedidoFeito.tp_status }}
                     </div>
                     <div class="mt-4 text-center">
-                        <Link :href="route('welcome')" class="w-full bg-[#FFD700] text-[#12183B] py-2 rounded-lg">
+                        <Link :href="route('welcome')">
                             <div class="w-full bg-[#FFD700] text-[#12183B] py-2 rounded-lg">
                                 Fazer outro pedido
+                            </div>
+                        </Link>
+                        <Link :href="route('meus-pedidos')" v-if="clienteLogado.nome">
+                            <div class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-2 rounded-lg">
+                                Acompanhar pedidos
                             </div>
                         </Link>
                     </div>
@@ -350,7 +355,7 @@ const verificarSeCadastroExiste = () => {
                         Fazer pedido sem se cadastrar
                     </button>
                     <button class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg" @click="navegarEstagio(ESTAGIO_VALIDAR_CADASTRO)">
-                        Fazer cadastro e acompanhar pedidos
+                        Fazer cadastro/login e acompanhar pedidos
                     </button>                    
                 </div>
                 <div class="mt-6" v-if="estagioAtual > 1 && estagioAtual < 2">
