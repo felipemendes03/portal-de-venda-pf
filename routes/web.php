@@ -34,6 +34,11 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('clientes', function(){
+    return Inertia::render('Cliente/Cliente');
+})->middleware(['auth', 'verified'])->name('cliente');
+
+
 Route::get('/api/pedidos/visitante', [PedidosVisitanteController::class, 'index'])->name('api.pedidos.visitante.index');
 Route::get('/api/pedidos/visitante/historico', [PedidosVisitanteController::class, 'getHistorico'])->name('api.pedidos.visitante.historico');
 Route::get('/api/pedidos/visitante/{id}', [PedidosVisitanteController::class, 'show'])->name('api.pedidos.visitante.show');
