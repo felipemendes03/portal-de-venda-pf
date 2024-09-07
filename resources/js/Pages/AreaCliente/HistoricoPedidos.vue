@@ -65,7 +65,6 @@ onMounted(() => {
                                             <span class="font-semibold">Observação: {{ pedido.ds_observacao }}</span>
                                         </p>
                                         <p class="text-sm text-gray-800 leading-tight font-semibold mt-2">Itens do Pedido:</p>
-                                        
                                         <table class="min-w-full divide-y divide-gray-200 my-2">
                                             <thead>
                                                 <tr>

@@ -29,7 +29,8 @@ const filtrar = () => {
         filtrados = pedidos.value.filter(item =>
             item.nm_cliente.toLowerCase().includes(word) ||
             item.tp_pagamento.toLowerCase().includes(word) ||
-            item.tp_status.toLowerCase().includes(word)
+            item.tp_status.toLowerCase().includes(word) ||
+            item.selecionado
         );
     });
 
@@ -51,24 +52,32 @@ const listarPedidos = () => {
 }
 
 const subtotal = () => {
-    return pedidosFiltrados.value.reduce((acc, item) => (acc*1) + (item.vl_total*1), 0);
+    return pedidosFiltrados.value
+    .filter(pedido => pedido.selecionado)
+    .reduce((acc, item) => (acc*1) + (item.vl_total*1), 0);
 };
 
 const marcarModificado = (pedido) => {
     pedido.modificado = true;
+    pedido.selecionado = true;
 }
 
 const alterarTipoStatusFiltrados = (tipoStatusTodos) => {
     pedidosFiltrados.value.forEach(pedido => {
-        pedido.tp_status = tipoStatusTodos;
-        marcarModificado(pedido);
+        if(pedido.selecionado){
+            pedido.tp_status = tipoStatusTodos;
+            marcarModificado(pedido);
+        }
     });
 }
 
 const alterarTipoPagamentoFiltrados = (tipoPagamentoTodos) => {
     pedidosFiltrados.value.forEach(pedido => {
-        pedido.tp_pagamento = tipoPagamentoTodos;
-        marcarModificado(pedido);
+        if(pedido.selecionado){
+            pedido.tp_pagamento = tipoPagamentoTodos;
+            marcarModificado(pedido);
+        }
+        
     });
 }
 
@@ -119,6 +128,16 @@ const addAlerta = (mensagem, tipo) => {
         alertObj.value.alertas.shift();
     }, 5000);
 }
+
+const toggleSelection = () => {
+    const isChecked = event.target.checked;
+    pedidosFiltrados.value.forEach(pedido => {
+        if(!pedido.modificado){
+            pedido.selecionado = isChecked;
+        }
+    });
+}
+
 </script>
 
 <template>
@@ -140,6 +159,7 @@ const addAlerta = (mensagem, tipo) => {
                             <tr>
                                 <th scope="col" class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     #
+                                    <input type="checkbox" @click="toggleSelection">
                                 </th>
                                 <th scope="col" class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Cliente
@@ -160,7 +180,9 @@ const addAlerta = (mensagem, tipo) => {
                             <tr>
                                 <td colspan="3" class="px-4 text-sm text-gray-900 text-right border"></td>
                                 <td class="px-4 text-sm text-gray-900 border">
-                                    <select class="w-full" v-model="tipoStatusTodos" @change="alterarTipoStatusFiltrados(tipoStatusTodos)">
+                                    <select 
+                                        :disabled="pedidosFiltrados.filter(p => p.selecionado).length == 0"
+                                        class="w-full" v-model="tipoStatusTodos" @change="alterarTipoStatusFiltrados(tipoStatusTodos)">
                                         <option value="PENDENTE_PAGAMENTO">Pendente Pagamento</option>
                                         <option value="EM_PREPARO">Em Preparo</option>
                                         <option value="AGUARDANDO_RETIRADA">Aguardando Retirada</option>
@@ -169,7 +191,9 @@ const addAlerta = (mensagem, tipo) => {
                                     </select>
                                 </td>
                                 <td class="px-4 text-sm text-gray-900 border">
-                                    <select class="w-full" v-model="tipoPagamentoFiltrados" @change="alterarTipoPagamentoFiltrados(tipoPagamentoFiltrados)">
+                                    <select 
+                                        :disabled="pedidosFiltrados.filter(p => p.selecionado).length == 0"
+                                        class="w-full" v-model="tipoPagamentoFiltrados" @change="alterarTipoPagamentoFiltrados(tipoPagamentoFiltrados)">
                                         <option value="DINHEIRO">Dinheiro</option>
                                         <option value="CARTAO">Cartão</option>
                                         <option value="PIX">Pix</option>
@@ -182,9 +206,17 @@ const addAlerta = (mensagem, tipo) => {
                         <tbody>
                            <template v-for="pedido in pedidosFiltrados" :key="pedido.id">
                                 <tr :class="pedido.modificado ? 'bg-yellow-100' : ''">
-                                    <td class="px-4 text-sm text-gray-900 border">{{ pedido.id }}</td>
                                     <td class="px-4 text-sm text-gray-900 border">
-                                        <input v-model="pedido.nm_cliente" @change="marcarModificado(pedido)" class="w-full" type="text">
+                                        {{ pedido.id }}
+                                        <input :disabled="pedido.modificado" type="checkbox" v-model="pedido.selecionado">
+                                    </td>
+                                    <td class="px-4 text-sm text-gray-900 border">
+                                        <input 
+                                            v-if="!pedido.id_cadastro_cliente"
+                                            v-model="pedido.nm_cliente" 
+                                            @change="marcarModificado(pedido)" 
+                                            class="w-full" type="text">
+                                        <span v-else>{{ pedido.nm_cliente }}</span>
                                     </td>
                                     <td class="px-4 text-sm text-gray-900 border">{{ formatarMoeda(pedido.vl_total) }}</td>
                                     <td class="px-4 text-sm text-gray-900 border">

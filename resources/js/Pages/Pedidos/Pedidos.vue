@@ -222,7 +222,7 @@ const addAlerta = (mensagem, tipo) => {
                                 <InputLabel for="valorPago" value="Valor pago*"/>
                                 <input class="w-full" type="number" min="0" name="valorPago" id="valorPago" v-model="pedidoForm.valorPago"/>
                             </div>
-                            <div class="my-4" v-show="pedidoForm.valorPago != pedidoForm.valorTotal">
+                            <div class="my-4">
                                 <span>Troco: {{ formatarMoeda(pedidoForm.valorPago - pedidoForm.valorTotal) }}</span>
                                 <br>
                                 <span v-if="pedidoForm.valorPago < pedidoForm.valorTotal" class="text-red-500">Valor pago menor que o total</span>

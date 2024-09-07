@@ -25,7 +25,9 @@ class PedidosController extends Controller
         $status = $request->input("status");
         $comItens = $request->input("comItens");
         $orderBy = $request->input("orderBy");
-        if(!$orderBy) $orderBy = 'id';
+        if(!$orderBy){
+            $orderBy = 'id';
+        }
         $pedidos = null;
         if($status){
             $pedidos = Pedido::where('tp_status', $status)->orderBy($orderBy)->get();

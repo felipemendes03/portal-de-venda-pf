@@ -19,6 +19,10 @@ class CadastroClienteController extends Controller {
             ->where('password', md5($request->senha))
             ->first();
 
+        if($cliente && $cliente->ativo == 0){
+            return response()->json(['error' => 'Usuário inativo'], 401);
+        }
+        
         if($cliente){
             $jwt = UsuariosDeClientesService::obterJwt($cliente->id);
             return response()->json(['token' => $jwt, 'token_type' => 'Bearer'], 200);

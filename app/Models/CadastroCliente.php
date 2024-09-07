@@ -11,7 +11,8 @@ class CadastroCliente extends Model
     protected $fillable = [
         'nome',
         'cpf',
-        'ativo'
+        'ativo',
+        'fiado',
     ];
     protected $hidden = [
         'password',

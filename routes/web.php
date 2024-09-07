@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CadastroClienteController;
+use App\Http\Controllers\ClientesController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PedidosController;
@@ -83,6 +84,7 @@ Route::middleware('auth')->group(function () {
     
     
     makeCrud(PedidosController::class, '/api/pedidos');
+    makeCrud(ClientesController::class, '/api/admin/clientes');
 });
 
 function makeCrud($controller, $basePath){

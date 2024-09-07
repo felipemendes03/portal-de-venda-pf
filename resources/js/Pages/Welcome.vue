@@ -511,7 +511,7 @@ const verificarSeCadastroExiste = () => {
                         <span class="px-4">Cartão</span>
                         <input type="radio" name="formaPagamento" v-model="pedido.formaPagamento" value="CARTAO" class="m-2 px-4 py-2 rounded-lg">
                     </div>
-                    <div v-show="false" class="flex justify-between items-center bg-white text-[#12183B] py-2 mt-4 rounded-lg">
+                    <div v-show="clienteLogado.fiado" class="flex justify-between items-center bg-white text-[#12183B] py-2 mt-4 rounded-lg">
                         <span class="px-4">Fiado <span class="text-sm">(Pagar no final da Social)</span></span>
                         <input type="radio" name="formaPagamento" v-model="pedido.formaPagamento" value="FIADO" class="m-2 px-4 py-2 rounded-lg">
                     </div>

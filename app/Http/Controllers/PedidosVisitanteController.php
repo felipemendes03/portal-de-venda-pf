@@ -84,6 +84,9 @@ class PedidosVisitanteController extends Controller
         if($cadastroCliente){
             $pedido->id_cadastro_cliente = $cadastroCliente->id;
             $pedido->nm_cliente = $cadastroCliente->nome;
+            if($cadastroCliente->fiado && $pedidoRequest['formaPagamento'] == 'FIADO'){
+                $pedido->tp_status = 'EM_PREPARO';
+            }
         }else{
             $pedido->nm_cliente = $pedidoRequest['nome'];
         }
