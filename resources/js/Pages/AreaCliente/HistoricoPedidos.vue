@@ -50,6 +50,9 @@ onMounted(() => {
                                 <td class="text-sm text-gray-900">
                                     <div class="px-2 py-4 mb-6 bg-[#fff] border-2 border-blue-300">
                                         <p class="text-sm text-gray-800 leading-tight">
+                                            <span class="font-semibold">#{{ pedido.id }}</span>
+                                        </p>
+                                        <p class="text-sm text-gray-800 leading-tight">
                                             <span class="font-semibold">Data: {{ formatarData(pedido.created_at_formatted) }}</span>
                                         </p>
                                         <p class="text-sm text-gray-800 leading-tight">

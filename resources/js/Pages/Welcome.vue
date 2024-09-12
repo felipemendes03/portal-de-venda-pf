@@ -13,6 +13,7 @@ const props = defineProps({
     }
 });
 
+const desabilitarBotaoPagamento = ref(false);
 const mostrarAlertaPixCopiado = ref(false);
 const mostrarAlertaErro = ref(false);
 const mensagemDeErro =  ref('');
@@ -115,7 +116,6 @@ const togglePasswordVisibility = () => {
 }
 
 onMounted(() => {
-
     axios.get(route('api.clientes.show'), {
         headers: {
             'Authorization': `${localStorage.getItem('token')}`
@@ -131,14 +131,7 @@ onMounted(() => {
 
 
    if(props.pedidoId > 0) {
-       axios.get(route('api.pedidos.visitante.show', props.pedidoId))
-       .then(response => {
-        pedidoFeito.value = response.data;
-        estagioAtual.value = 0;
-       })
-       .catch(error => {
-           console.log(error);
-       });
+        carregarStatusPedido();
    }else{
         axios.get(route('api.pedidos.visitante.index'))
         .then(response => {
@@ -156,6 +149,63 @@ onMounted(() => {
         });
    }
 });
+
+
+const carregarStatusPedido = () => {
+    axios.get(route('api.pedidos.visitante.show', props.pedidoId))
+       .then(response => {
+        pedidoFeito.value = response.data;
+        estagioAtual.value = 0;
+       })
+       .catch(error => {
+           console.log(error);
+       });
+}
+const pagarComCartao = () => {
+
+    desabilitarBotaoPagamento.value = true;
+
+    axios.post(route('api.sumup.checkout', {pedidoId: pedidoFeito.value.id}))
+    .then(response => {
+        const sumupCard = SumUpCard.mount({
+            id: 'sumup-card',
+            checkoutId: response.data.id,
+            title: 'Pioneiros da Fé',
+            currency: 'BRL',
+            locale: 'pt-BR',
+            country: 'BR',
+            onLoad: () => {
+                desabilitarBotaoPagamento.value = false;
+            },
+            onResponse: (type, body) => {
+                if(type === 'success'){
+                    sumupCard.unmount();
+                    if( body.status === 'PAID'){
+                            axios.post(route('api.sumup.confirmar-pagamento', {pedidoId: pedidoFeito.value.id}))
+                        .then(response => {
+                            alert('Pagamento confirmado com sucesso');
+                        })
+                        .catch(error => {
+                            mostrarMensagemErro(error.response.data.message);
+                        })
+                        .finally(() => {
+                            carregarStatusPedido();
+                        });
+                    } else {
+                        carregarStatusPedido();
+                        mostrarMensagemErro('Houve um erro ao tentar confirmar o pagamento');
+                    }
+                }
+            },
+        });
+    })
+    .catch(error => {
+       mostrarMensagemErro(error.response.data.message);
+    })
+    .finally(() => {
+        carregarStatusPedido();
+    });
+}
 
 const addProduto = (produto, quantidade) => {
     produto.quantidade += quantidade;
@@ -321,8 +371,19 @@ const verificarSeCadastroExiste = () => {
                         Seu número de pedido é: {{ pedidoFeito.id }}
                     </div>
                     <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="pedidoFeito.tp_status=='PENDENTE_PAGAMENTO'">
-                        Para finalizar seu pedido, efetue o pagamento no valor de {{ formatarMoeda(pedidoFeito.vl_total) }} no caixa. <br>
-                        <div class="mt-4 text-center">
+                        Para finalizar seu pedido, efetue o pagamento no valor de {{ formatarMoeda(pedidoFeito.vl_total) }} no caixa ou use a opção para pagar online. <br>
+
+                        <div v-if="pedidoFeito.tp_pagamento=='CARTAO'">
+                            <button @click="pagarComCartao()" 
+                                class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg"
+                                :disabled="desabilitarBotaoPagamento"
+                                :class="{ 'cursor-not-allowed bg-[#ccc]': desabilitarBotaoPagamento }"
+                                >
+                                Pagar com cartão de crédito online
+                            </button>
+                            <div style="background-color: blanchedalmond;" id="sumup-card"></div>
+                        </div>
+                        <div class="mt-4 text-center" v-else>
                                 <span class="text-lg">Para adiantar, você pode pagar via PIX para a chave pix abaixo e apresentar o comprovante no caixa.</span>
                                 <p class="bg-white text-black p-2 m-2 flex flex-row items-center justify-center rounded-lg">
                                    pioneirosdafeaps@gmail.com 
