@@ -140,7 +140,8 @@ onMounted(() => {
                     id: produto.id,
                     nome: produto.nome,
                     valor: produto.valor,
-                    quantidade: 0
+                    quantidade: 0,
+                    estoqueDisponivel: produto.estoqueDisponivel
                 };
             });
         })
@@ -246,7 +247,7 @@ const enviarPedido = () => {
             })
             mostrarMensagemErro(msg);
             produtos.value = produtos.value.filter(produto => error.response.data.itens.indexOf(produto.nome) < 0);
-            estagioAtual.value = 2;
+            estagioAtual.value = ESTAGIO_PRODUTOS;
             calcularTotal();
         } else {
             mostrarMensagemErro("Houve um erro ao tentar enviar o pedido.");
@@ -256,11 +257,12 @@ const enviarPedido = () => {
 }
 
 const ajustarQuantidade = (produto) => {
+    if (produto.quantidade > produto.estoqueDisponivel) {
+        produto.quantidade = produto.estoqueDisponivel;
+    }
+
     if (produto.quantidade < 0) {
         produto.quantidade = 0;
-    }
-    if (produto.quantidade > 10) {
-        produto.quantidade = 10;
     }
 }
 
@@ -528,9 +530,15 @@ const verificarSeCadastroExiste = () => {
                                 <span class="px-4">{{ produto.nome }} - {{ formatarMoeda(produto.valor) }}</span>
                                 <div class="flex justify-between items-center bg-white text-[#12183B] py-2 mt-4 rounded-lg">
                                     <button class="m-2 px-3 py-2 rounded-lg bg-[#FFD700]" @click="addProduto(produto, -1)">-</button>
-                                    <input type="number" v-model="produto.quantidade" class="rounded-lg" min="0" max="10" value="0" @change="calcularTotal(produto)">
-                                    <button class="m-2 px-3 py-2 rounded-lg bg-[#FFD700]" @click="addProduto(produto, 1)" >+</button>
+                                    <div class="flex flex-col items-center">
+                                        <input type="number" v-model="produto.quantidade" class="rounded-lg" min="0" :max="produto.estoqueDisponivel" value="0" @change="calcularTotal(produto)">
+                                        <div class="text-[#12183B] text-sm" v-if="produto.estoqueDisponivel < 5">
+                                            Máx.: {{ produto.estoqueDisponivel }}
+                                        </div>
+                                    </div>
+                                    <button class="m-2 px-3 py-2 rounded-lg bg-[#FFD700]" @click="addProduto(produto, 1)">+</button>
                                 </div>
+                                
                             </div>
                         </li>
                         <li>

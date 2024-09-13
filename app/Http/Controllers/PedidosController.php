@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\EstoqueService;
 use App\Services\UsuariosService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -65,7 +66,7 @@ class PedidosController extends Controller
         $itens = $request->itens;
         $itensMapeados = [];
         $valorTotal = 0;
-
+        $produtosInvativos = [];
         foreach ($itens as $item) {
             $produto = Produtos::find($item['id']);
             $itensMapeados[] = [
@@ -75,6 +76,16 @@ class PedidosController extends Controller
                 "vl_total" => $item['quantidade'] * $produto->valor
             ];
             $valorTotal += $itensMapeados[count($itensMapeados)-1]["vl_total"];
+            if(EstoqueService::obterEstoqueDisponivel($produto->id) < $item['quantidade']){
+                $produtosInvativos[] = $produto->nome;
+            }
+        }
+
+        if(!empty($produtosInvativos)){
+            EstoqueService::atualizarProdutosAtivos();
+            return response()->json([
+                "message" => "Enquanto você fazia o pedido, os seguintes itens não estão mais disponíveis: " .  implode(', ', $produtosInvativos)
+            ], 422);
         }
 
         $pedido = new Pedido;
@@ -87,6 +98,7 @@ class PedidosController extends Controller
             PedidosProduto::create($item);
         }
 
+        EstoqueService::atualizarProdutosAtivos();
         return response()->json($pedido, 201);
     }
 
@@ -96,6 +108,7 @@ class PedidosController extends Controller
         $pedido->fill($request->all());
         $pedido->save();
 
+        EstoqueService::atualizarProdutosAtivos();
         return response()->json($pedido);
     }
 
@@ -109,6 +122,7 @@ class PedidosController extends Controller
         $pedido = Pedido::find($id);
         $pedido->delete();
 
+        EstoqueService::atualizarProdutosAtivos();
         return response()->json(null, 204);
     }
 }

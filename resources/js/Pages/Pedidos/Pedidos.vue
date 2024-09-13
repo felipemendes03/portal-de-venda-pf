@@ -122,6 +122,11 @@ const addAlerta = (mensagem, tipo) => {
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         nowrap>
+                                        Estoque
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        nowrap>
                                         Quantidade
                                     </th>
                                     <th scope="col"
@@ -134,8 +139,12 @@ const addAlerta = (mensagem, tipo) => {
                                 <tr v-for="produto in produtos">
                                     <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
                                     <td class="px-4 text-sm text-gray-900" nowrap>{{ formatarMoeda(produto.valor) }}</td>
+                                    <td class="px-4 text-sm text-gray-900">{{ produto.estoqueDisponivel }}</td>
                                     <td class="px-4 text-sm text-gray-900">
-                                        <input type="number" min="0" v-model="produto.quantidade" />
+                                        <input 
+                                        class="w-full"
+                                        type="number" min="0" :max="produto.estoqueDisponivel" 
+                                        v-model="produto.quantidade" />
                                     </td>
                                     <td class="px-4 text-sm text-gray-900" nowrap>
                                         {{ formatarMoeda(produto.valor * produto.quantidade) }}

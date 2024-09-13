@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CadastroCliente;
 use App\Models\Pedido;
 use App\Models\PedidosProduto;
+use App\Services\EstoqueService;
 use App\Services\UsuariosDeClientesService;
 use Illuminate\Http\Request;
 use App\Models\Produtos;
@@ -17,6 +18,12 @@ class PedidosVisitanteController extends Controller
         $produtos = Produtos::where('ativo', 'S')
         ->orderBy('nome', 'asc')
         ->get();
+
+        $produtos->map(function($produto){
+            $produto->estoqueDisponivel = EstoqueService::obterEstoqueDisponivel($produto->id);
+            return $produto;
+        });
+
         return response()->json([
             'produtos' => $produtos
         ]);
@@ -64,13 +71,16 @@ class PedidosVisitanteController extends Controller
                 "vl_produto" => $produto->valor,
                 "vl_total" => $item['quantidade'] * $produto->valor
             ];
-            if($produto->ativo == 'N'){
+            
+            if(EstoqueService::obterEstoqueDisponivel($produto->id) < $item['quantidade']){
                 $produtosInvativos[] = $produto->nome;
             }
+
             $valorTotal += $itensMapeados[count($itensMapeados)-1]["vl_total"];
         }
         
-        if(count($produtosInvativos) > 0){
+        if(!empty($produtosInvativos)){
+            EstoqueService::atualizarProdutosAtivos();
             return response()->json([
                 "message" => "Enquanto você fazia o pedido, os seguintes itens não estão mais disponíveis:",
                 "itens" => $produtosInvativos
@@ -98,6 +108,7 @@ class PedidosVisitanteController extends Controller
             PedidosProduto::create($item);
         }
 
+        EstoqueService::atualizarProdutosAtivos();
         return response()->json($pedido, 201);
     }
 

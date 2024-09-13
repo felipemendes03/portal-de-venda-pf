@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produtos;
+use App\Services\EstoqueService;
 use App\Services\UsuariosService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,7 +32,13 @@ class ProdutosController extends Controller
     {
         $orderBy = $request->input("orderBy");
         if(!$orderBy) $orderBy = 'id';
-        return response()->json(Produtos::orderBy($orderBy)->get(), 200, [], JSON_NUMERIC_CHECK);
+
+        $produtos = Produtos::orderBy($orderBy)->get();
+        foreach ($produtos as $produto) {
+            $produto->estoqueDisponivel = EstoqueService::obterEstoqueDisponivel($produto->id);
+        }
+
+        return response()->json($produtos, 200, [], JSON_NUMERIC_CHECK);
     }
 
     public function update(Request $request, int $id): JsonResponse
