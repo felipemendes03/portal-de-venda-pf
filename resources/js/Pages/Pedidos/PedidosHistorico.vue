@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import axios from 'axios';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue'
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import Alert from '@/Components/Alert.vue';
@@ -151,6 +151,9 @@ const toggleSelection = () => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-2">
+                    <Link :href="route('pedidos')">
+                        <PrimaryButton>Novo</PrimaryButton>
+                    </Link>
                     <div class="mb-2">
                         <input id="pesquisa" class="mt-1 w-full" placeholder="Pesquisar..." v-model="q" v-on:keyup="filtrar">
                     </div>
