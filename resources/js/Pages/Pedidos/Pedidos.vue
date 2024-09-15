@@ -53,6 +53,7 @@ const finalizarPedido = ( pedido ) => {
         "nm_cliente": pedido.nomeCliente,
         "tp_pagamento": pedido.formaPagamento,
         "ds_observacao": pedido.observacao,
+        "nr_telefone": pedido.numeroTelefone,
         "itens": pedido.produtos
     }
 
@@ -216,6 +217,10 @@ const addAlerta = (mensagem, tipo) => {
                             <div>
                                 <InputLabel for="nomeCliente" value="Nome Cliente*"/>
                                 <input class="w-full" type="text" name="nomeCliente" id="nomeCliente" v-model="pedidoForm.nomeCliente"/>
+                            </div>
+                            <div>
+                                <InputLabel for="numeroWhatsApp" value="Número do WhatsApp"/>
+                                <input class="w-full" type="number" placeholder="5511900000000" name="numeroWhatsApp" id="numeroWhatsApp" v-model="pedidoForm.numeroTelefone"/>
                             </div>
                             <div>
                                 <InputLabel for="formaPagamento" value="Forma de pagamento*"/>

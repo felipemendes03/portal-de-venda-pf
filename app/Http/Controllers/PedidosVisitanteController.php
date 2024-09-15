@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CadastroCliente;
 use App\Models\Pedido;
 use App\Models\PedidosProduto;
+use App\Services\EnviarMensagemWhatsApp;
 use App\Services\EstoqueService;
 use App\Services\UsuariosDeClientesService;
 use Illuminate\Http\Request;
@@ -62,6 +63,7 @@ class PedidosVisitanteController extends Controller
         $itensMapeados = [];
         $valorTotal = 0;
         $produtosInvativos = [];
+        $whatsapp = $cadastroCliente ? $cadastroCliente->whatsapp : $pedidoRequest['numeroTelefone'];
 
         foreach ($itens as $item) {
             $produto = Produtos::find($item['id']);
@@ -91,6 +93,7 @@ class PedidosVisitanteController extends Controller
         $pedido->fill($pedidoRequest);
         $pedido->vl_total = $valorTotal;
         $pedido->tp_status = 'PENDENTE_PAGAMENTO';
+        $pedido->nr_telefone = $whatsapp;
         if($cadastroCliente){
             $pedido->id_cadastro_cliente = $cadastroCliente->id;
             $pedido->nm_cliente = $cadastroCliente->nome;
@@ -109,6 +112,8 @@ class PedidosVisitanteController extends Controller
         }
 
         EstoqueService::atualizarProdutosAtivos();
+        $mensagem = "Olá " . $pedido->nm_cliente . ", recebemos seu pedido #". $pedido->id ." e o status dele é: " . $pedido->tp_status;
+        EnviarMensagemWhatsApp::enviar($pedido->nr_telefone, $mensagem);
         return response()->json($pedido, 201);
     }
 

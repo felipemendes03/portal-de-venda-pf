@@ -24,6 +24,7 @@ const pedido = ref({
     nome: '',
     observacao: '',
     formaPagamento: '',
+    numeroTelefone: '',
     itens: []
 });
 
@@ -31,6 +32,7 @@ const cadastro = ref({
     nome: '',
     cpf: '',
     senha: '',
+    whatsapp: '',
     confirmacaoSenha: ''
 });
 
@@ -50,7 +52,7 @@ const ESTAGIO_FORMA_PAGAMENTO = 5;
 const ESTAGIO_REVISAO = 6;
 
 const estagiosPedido = ref([
-    { id: ESTAGIO_NOME, nome: 'Nome', podeProximo: () =>  pedido.value.nome.replace(/\s/g, '').length > 5, podeVoltar: () =>  true},
+    { id: ESTAGIO_NOME, nome: 'Nome', podeProximo: () =>  pedido.value.nome.replace(/\s/g, '').length > 5 && (!pedido.numeroTelefone || pedido.numeroTelefone.toString().length > 0 && pedido.numeroTelefone.toString().length != 13), podeVoltar: () =>  true},
     { id: ESTAGIO_PRODUTOS, nome: 'Escolha os itens do seu pedido', podeProximo: () =>  produtos.value.filter(produto => produto.quantidade > 0).length > 0, podeVoltar: () =>  !clienteLogado.value.nome },
     { id: ESTAGIO_OBSERVACAO, nome: 'Alguma Observação?', podeProximo: () =>  true, podeVoltar: () =>  true},
     { id: ESTAGIO_FORMA_PAGAMENTO, nome: 'Forma de pagamento', podeProximo: () =>  pedido.value.formaPagamento !== '' , podeVoltar: () =>  true},
@@ -60,6 +62,7 @@ const estagiosPedido = ref([
 const podeCadastro = () => {
     return cadastro.value.nome.replace(/\s/g, '').length > 5 
         && cadastro.value.senha.replace(/\s/g, '').length > 5 
+        && !cadastro.value.whatsapp || cadastro.value.whatsapp.toString().length === 13
         && validarCpf(cadastro.value.cpf)
         && (cadastro.value.senha === cadastro.value.confirmacaoSenha || showPassword.value);
 }
@@ -70,6 +73,7 @@ const efetuarCadastro = () => {
         let token = response.data.token;
         let tokenType = response.data.token_type;
         localStorage.setItem('token', tokenType + ' ' + token);
+        window.location.reload();
     })
     .catch(error => {
         console.log(error);
@@ -450,6 +454,13 @@ const verificarSeCadastroExiste = () => {
                         <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="cadastro.nome.replace(/\s/g, '').length > 0 && cadastro.nome.replace(/\s/g, '').length < 6">
                             Falta(m) pelo menos mais {{ 6 - cadastro.nome.replace(/\s/g, '').length }} letra(s)
                         </div>
+                        <span class="text-white">WhatsApp</span>
+                        <input v-model="cadastro.whatsapp" type="number" class="w-full px-4 py-2 text-black rounded-lg" placeholder="5511900000000"> 
+                        <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" 
+                            length="13"
+                            v-if="cadastro.whatsapp.toString().length > 0 && cadastro.whatsapp.toString().length != 13">
+                            Falta(m) mais {{ 13 - cadastro.whatsapp.toString().length }} caractere(s)
+                        </div>
                         <span class="text-white">Senha</span>
                         <div class="relative w-full">
                             <input :type="showPassword ? 'text' : 'password'" 
@@ -518,6 +529,11 @@ const verificarSeCadastroExiste = () => {
                     <input v-model="pedido.nome" type="text" class="w-full px-4 py-2 text-black rounded-lg" placeholder="Digite seu nome"> 
                     <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="pedido.nome.replace(/\s/g, '').length > 0 && pedido.nome.replace(/\s/g, '').length < 6">
                         Falta(m) pelo menos mais {{ 6 - pedido.nome.replace(/\s/g, '').length }} letra(s)
+                    </div>
+                    <!-- WhatsApp -->
+                    <input v-model="pedido.numeroTelefone" type="number" class="w-full px-4 py-2 text-black rounded-lg" placeholder="WhatsApp. Ex.: 5511900000000">
+                    <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="pedido.numeroTelefone.toString().length > 0 && pedido.numeroTelefone.toString().length != 13">
+                        Falta(m) mais {{ 13 - pedido.numeroTelefone.toString().length }} caractere(s)
                     </div>
                 </div>
                 <div v-if="estagioAtual === ESTAGIO_PRODUTOS">

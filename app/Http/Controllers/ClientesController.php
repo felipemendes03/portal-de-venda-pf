@@ -35,6 +35,7 @@ class ClientesController extends Controller {
             'cpf' => 'required|size:14',
             'password' => 'required|min:6',
             'ativo' => 'required',
+            'whatsapp' => 'nullable|size:13'
         ], [
             'nome.required' => 'O nome é obrigatório.',
             'cpf.required' => 'O CPF é obrigatório.',
@@ -42,6 +43,7 @@ class ClientesController extends Controller {
             'password.required' => 'A senha é obrigatória.',
             'password.min' => 'A senha deve ter no mínimo 6 caracteres.',
             'ativo.required' => 'O status ativo é obrigatório.',
+            'whatsapp.size' => 'O WhatsApp deve ter 13 caracteres ou ser vazio.',
         ]);
 
         $cliente = new CadastroCliente();
@@ -50,6 +52,7 @@ class ClientesController extends Controller {
         $cliente->ativo = $request->ativo;
         $cliente->password = md5($request->password);
         $cliente->fiado = $request->fiado;
+        $cliente->whatsapp = $request->whatsapp;
 
         $cliente->save();
         return response()->json(['message' => 'Cliente cadastrado com sucesso']);
@@ -62,12 +65,14 @@ class ClientesController extends Controller {
             'cpf' => 'required|size:14',
             'ativo' => 'required',
             'password' => 'nullable|min:6',
+            'whatsapp' => 'nullable|size:13'
         ], [
             'nome.required' => 'O nome é obrigatório.',
             'cpf.required' => 'O CPF é obrigatório.',
             'cpf.size' => 'O CPF deve ter 14 caracteres.',
             'ativo.required' => 'O status ativo é obrigatório.',
             'password.min' => 'A senha deve ter no mínimo 6 caracteres.',
+            'whatsapp.size' => 'O WhatsApp deve ter 13 caracteres ou ser vazio.',
         ]);
 
         $cliente = CadastroCliente::find($id);
@@ -80,6 +85,7 @@ class ClientesController extends Controller {
         $cliente->cpf = $request->cpf;
         $cliente->ativo = $request->ativo;
         $cliente->fiado = $request->fiado;
+        $cliente->whatsapp = $request->whatsapp;
         
         if ($request->password) {
             $cliente->password = md5($request->password);

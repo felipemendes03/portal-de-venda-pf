@@ -42,6 +42,7 @@ const salvarCliente = () => {
         cpf: clienteSelecionado.value.cpf,
         ativo: clienteSelecionado.value.ativo,
         password: clienteSelecionado.value.password,
+        whatsapp: clienteSelecionado.value.whatsapp,
         fiado: clienteSelecionado.value.fiado
     };
 
@@ -137,6 +138,11 @@ const addAlerta = (mensagem, tipo = 'success') => {
                 <div>
                     <InputLabel for="cpf" value="cpf" />
                     <TextInput v-cpf-mask id="cpf" ref="cpf" v-model="clienteSelecionado.cpf" type="text"
+                        class="mt-1 block w-full" />
+                </div>
+                <div>
+                    <InputLabel for="whatsapp" value="Whatsapp" />
+                    <TextInput v-whatsapp-mask id="whatsapp" ref="whatsapp" v-model="clienteSelecionado.whatsapp" type="text"
                         class="mt-1 block w-full" />
                 </div>
                 <div>

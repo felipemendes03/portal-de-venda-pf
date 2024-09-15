@@ -13,5 +13,6 @@ class Pedido extends Model
         'tp_status',
         'tp_pagamento',
         'ds_observacao',
+        'nr_telefone'
     ];
 }

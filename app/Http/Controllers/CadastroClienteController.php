@@ -53,7 +53,8 @@ class CadastroClienteController extends Controller {
         $request->validate([
             'nome' => 'required|min:6',
             'cpf' => 'required|size:14',
-            'senha' => 'required|min:6'
+            'senha' => 'required|min:6',
+            'whatsapp' => 'nullable|size:13'
         ]);
 
         if(CadastroCliente::where('cpf', $request->cpf)->exists()){
@@ -63,6 +64,7 @@ class CadastroClienteController extends Controller {
         $cliente = new CadastroCliente();
         $cliente->nome = $request->nome;
         $cliente->cpf = $request->cpf;
+        $cliente->whatsapp = $request->whatsapp;
         $cliente->password = md5($request->senha);
         $cliente->save();
 

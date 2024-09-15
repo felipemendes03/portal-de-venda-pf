@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\EnviarMensagemWhatsApp;
 use App\Services\EstoqueService;
 use App\Services\UsuariosService;
 use Carbon\Carbon;
@@ -99,6 +100,8 @@ class PedidosController extends Controller
         }
 
         EstoqueService::atualizarProdutosAtivos();
+        $mensagem = "Olá " . $pedido->nm_cliente . ", recebemos seu pedido #". $pedido->id ." e o status dele é: " . $pedido->tp_status;
+        EnviarMensagemWhatsApp::enviar($pedido->nr_telefone, $mensagem);
         return response()->json($pedido, 201);
     }
 
@@ -109,6 +112,10 @@ class PedidosController extends Controller
         $pedido->save();
 
         EstoqueService::atualizarProdutosAtivos();
+
+        $mensagem = "Seu pedido #".  $pedido->id ." foi atualizado para: " . $pedido->tp_status;
+        EnviarMensagemWhatsApp::enviar($pedido->nr_telefone, $mensagem);
+
         return response()->json($pedido);
     }
 
