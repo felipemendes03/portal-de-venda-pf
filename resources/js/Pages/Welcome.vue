@@ -14,6 +14,7 @@ const props = defineProps({
 });
 
 const desabilitarBotaoPagamento = ref(false);
+const podeEnviarPedido = ref(true);
 const mostrarAlertaPixCopiado = ref(false);
 const mostrarAlertaErro = ref(false);
 const mensagemDeErro =  ref('');
@@ -230,6 +231,7 @@ const calcularTotal = (produto) => {
 }
 
 const enviarPedido = () => {
+    podeEnviarPedido.value = false;
     pedido.value.itens = produtos.value.filter(produto => produto.quantidade > 0);
     axios.post(route('api.pedidos.visitante.store'),
         {
@@ -257,6 +259,8 @@ const enviarPedido = () => {
             mostrarMensagemErro("Houve um erro ao tentar enviar o pedido.");
         }
         console.log(error);
+    }).finally(() => {
+        podeEnviarPedido.value = true;
     });
 }
 
@@ -639,7 +643,11 @@ const verificarSeCadastroExiste = () => {
                 <div>
                     <button @click="navegarEstagio(estagioAtual-1)" class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg" v-if="estagiosPedido.filter(e => e.id === estagioAtual && e.podeVoltar() ).length > 0">Voltar</button>
                     <button @click="navegarEstagio(estagioAtual+1)" class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg mb-6" v-if="estagioAtual < (estagiosPedido.length) && estagiosPedido.filter(e => e.id === estagioAtual && e.podeProximo() ).length > 0">Avançar</button>
-                    <button class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg mb-6" v-if="estagioAtual === (estagiosPedido.length)" @click="enviarPedido">Enviar Pedido</button>
+                    <button 
+                        class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg mb-6" 
+                        :disabled="!podeEnviarPedido"
+                        v-if="estagioAtual === (estagiosPedido.length)" 
+                        @click="enviarPedido">Enviar Pedido</button>
                 </div>
             </main>
         </div>
