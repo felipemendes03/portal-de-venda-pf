@@ -77,39 +77,41 @@ const salvarRegistro = () => {
         <div class="py-12">
             <div class="mx-2">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                   <table class="w-full table-auto my-2">
-                        <thead>
-                            <tr>
-                                <th class="p-4 border border-slate-200">
-                                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                                        ID
-                                    </p>
-                                </th>
-                                <th class="p-4 border border-slate-200 w-full">
-                                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                                        Nome
-                                    </p>
-                                </th>
-                                <th class="p-4 border border-slate-200">
-                                    <p class="flex justify-center block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                                        <SecondaryButton @click="cadastrarOuEditarPerfil({})">Novo</SecondaryButton>
-                                    </p>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-center">
-                            <tr v-for="perfil in profiles">
-                                <td class="border border-slate-200"> {{ perfil.id }}</td>
-                                <td class="border border-slate-200"> {{ perfil.nm_perfil }}</td>
-                                <td class="border border-slate-200">
-                                    <div class="flex text-center">
-                                        <Pencil fillColor="#134e4a" title="Editar" @click="cadastrarOuEditarPerfil(perfil)" class="cursor-pointer border-2 p-2"/>
-                                        <Delete fillColor="#be123c" title="Apagar" @click="apagarUsuario(perfil)" class="cursor-pointer border-2 ml-1 p-2"/>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody> 
-                    </table>
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto my-2">
+                            <thead>
+                                <tr>
+                                    <th class="p-4 border border-slate-200">
+                                        <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                            ID
+                                        </p>
+                                    </th>
+                                    <th class="p-4 border border-slate-200 w-full">
+                                        <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                            Nome
+                                        </p>
+                                    </th>
+                                    <th class="p-4 border border-slate-200">
+                                        <p class="flex justify-center block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                            <SecondaryButton @click="cadastrarOuEditarPerfil({})">Novo</SecondaryButton>
+                                        </p>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <tr v-for="perfil in profiles">
+                                    <td class="border border-slate-200"> {{ perfil.id }}</td>
+                                    <td class="border border-slate-200"> {{ perfil.nm_perfil }}</td>
+                                    <td class="border border-slate-200">
+                                        <div class="flex text-center">
+                                            <Pencil fillColor="#134e4a" title="Editar" @click="cadastrarOuEditarPerfil(perfil)" class="cursor-pointer border-2 p-2"/>
+                                            <Delete fillColor="#be123c" title="Apagar" @click="apagarUsuario(perfil)" class="cursor-pointer border-2 ml-1 p-2"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody> 
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

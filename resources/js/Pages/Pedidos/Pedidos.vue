@@ -173,47 +173,49 @@ const addAlerta = (mensagem, tipo) => {
                         
                         <div>
                             <span>Resumo do pedido</span>
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
-                                            Nome do Produto
-                                        </th>
-                                        <th scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Valor
-                                        </th>
-                                        <th scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                            nowrap>
-                                            Quantidade
-                                        </th>
-                                        <th scope="col"
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Subtotal
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="produto in pedidoForm.produtos">
-                                        <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
-                                        <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
-                                        <td class="px-4 text-sm text-gray-900">{{ produto.quantidade }}</td>
-                                        <td class="px-4 text-sm text-gray-900">
-                                            {{ formatarMoeda(produto.valor * produto.quantidade) }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3" class="px-4 text-sm text-gray-900 text-right">Total</td>
-                                        <td class="px-4 text-sm text-gray-900">
-                                            {{ formatarMoeda(pedidoForm.valorTotal) }}
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col"
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
+                                                Nome do Produto
+                                            </th>
+                                            <th scope="col"
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Valor
+                                            </th>
+                                            <th scope="col"
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                nowrap>
+                                                Quantidade
+                                            </th>
+                                            <th scope="col"
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Subtotal
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr v-for="produto in pedidoForm.produtos">
+                                            <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
+                                            <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
+                                            <td class="px-4 text-sm text-gray-900">{{ produto.quantidade }}</td>
+                                            <td class="px-4 text-sm text-gray-900">
+                                                {{ formatarMoeda(produto.valor * produto.quantidade) }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="px-4 text-sm text-gray-900 text-right">Total</td>
+                                            <td class="px-4 text-sm text-gray-900">
+                                                {{ formatarMoeda(pedidoForm.valorTotal) }}
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
                         </div>
                         <div class="m-2 sm:w-1/2">
                             <div>

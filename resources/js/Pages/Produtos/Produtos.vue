@@ -141,51 +141,53 @@ const addAlerta = (mensagem) => {
                     </div>
                     <hr>
                     <div class="m-2">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        id
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
-                                        Nome do Produto
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Valor
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Estoque
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Estoque Disponível
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        nowrap>
-                                        Ativo
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="produto in produtos">
-                                    <td class="px-4 text-sm text-gray-900">{{ produto.id }}</td>
-                                    <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
-                                    <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
-                                    <td class="px-4 text-sm text-gray-900">{{ produto.estoque }}</td>
-                                    <td class="px-4 text-sm text-gray-900">{{ produto.estoqueDisponivel }}</td>
-                                    <td class="px-4 text-sm text-gray-900">{{ produto.ativo == "S" ? "SIM" : "NÃO" }}</td>
-                                    <td class="px-4 text-sm text-gray-900"><PrimaryButton @click="editarProduto(produto)">editar</PrimaryButton></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            id
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
+                                            Nome do Produto
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Valor
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Estoque
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Estoque Disponível
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            nowrap>
+                                            Ativo
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr v-for="produto in produtos">
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.id }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.estoque }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.estoqueDisponivel }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.ativo == "S" ? "SIM" : "NÃO" }}</td>
+                                        <td class="px-4 text-sm text-gray-900"><PrimaryButton @click="editarProduto(produto)">editar</PrimaryButton></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div> 
                 </div>
 
