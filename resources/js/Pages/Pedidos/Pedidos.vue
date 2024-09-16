@@ -109,59 +109,61 @@ const addAlerta = (mensagem, tipo) => {
                     </div>
                     <div class="m-2 font-semibold text-xl text-gray-800 leading-tight">Novo pedido</div>
                     <div v-show="fluxoPedido=='PEDIDO'">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
-                                        Nome do Produto
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Valor
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        nowrap>
-                                        Estoque
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        nowrap>
-                                        Quantidade
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Subtotal
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="produto in produtos">
-                                    <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
-                                    <td class="px-4 text-sm text-gray-900" nowrap>{{ formatarMoeda(produto.valor) }}</td>
-                                    <td class="px-4 text-sm text-gray-900">{{ produto.estoqueDisponivel }}</td>
-                                    <td class="px-4 text-sm text-gray-900">
-                                        <input 
-                                        class="w-full"
-                                        type="number" min="0" :max="produto.estoqueDisponivel" 
-                                        v-model="produto.quantidade" />
-                                    </td>
-                                    <td class="px-4 text-sm text-gray-900" nowrap>
-                                        {{ formatarMoeda(produto.valor * produto.quantidade) }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="3" class="px-4 text-sm text-gray-900 text-right">Total</td>
-                                    <td class="px-4 text-sm text-gray-900">
-                                        {{ formatarMoeda(calcularTotal()) }}
-                                    </td>
-                                </tr>
-                            </tfoot>
-                            
-                        </table>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
+                                            Nome do Produto
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Valor
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            nowrap>
+                                            Estoque
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            nowrap>
+                                            Quantidade
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Subtotal
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr v-for="produto in produtos">
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
+                                        <td class="px-4 text-sm text-gray-900" nowrap>{{ formatarMoeda(produto.valor) }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.estoqueDisponivel }}</td>
+                                        <td class="px-4 text-sm text-gray-900">
+                                            <input 
+                                            class="w-full"
+                                            type="number" min="0" :max="produto.estoqueDisponivel" 
+                                            v-model="produto.quantidade" />
+                                        </td>
+                                        <td class="px-4 text-sm text-gray-900" nowrap>
+                                            {{ formatarMoeda(produto.valor * produto.quantidade) }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="px-4 text-sm text-gray-900 text-right">Total</td>
+                                        <td class="px-4 text-sm text-gray-900">
+                                            {{ formatarMoeda(calcularTotal()) }}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                                
+                            </table>
+                        </div>
                         <div class="my-4 text-end">
                             <PrimaryButton @click="fecharPedido(produtos)">Fechar Pedido</PrimaryButton>
                         </div>

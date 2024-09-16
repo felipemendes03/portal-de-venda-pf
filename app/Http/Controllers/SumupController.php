@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pedido;
 use App\Models\SumupPagamentos;
+use App\Services\EnviarMensagemWhatsApp;
 use Faker\Provider\Uuid;
 use Illuminate\Http\JsonResponse;
 
@@ -93,6 +94,8 @@ class SumupController extends Controller {
             $pedido->save();
             $sumup->tp_situacao = 'PAID';
             $sumup->save();
+            $mensagem = "Seu pedido #".  $pedido->id ." foi atualizado para: " . $pedido->tp_status;
+            EnviarMensagemWhatsApp::enviar($pedido->nr_telefone, $mensagem);
         } else {
             $sumup->tp_situacao = $response['status'];
             $sumup->save();
