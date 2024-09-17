@@ -458,7 +458,7 @@ const verificarSeCadastroExiste = () => {
                         <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="cadastro.nome.replace(/\s/g, '').length > 0 && cadastro.nome.replace(/\s/g, '').length < 6">
                             Falta(m) pelo menos mais {{ 6 - cadastro.nome.replace(/\s/g, '').length }} letra(s)
                         </div>
-                        <span class="text-white">WhatsApp</span>
+                        <span class="text-white">WhatsApp. Ex.: 5511900000000</span>
                         <input v-model="cadastro.whatsapp" type="number" class="w-full px-4 py-2 text-black rounded-lg" placeholder="5511900000000"> 
                         <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" 
                             length="13"
@@ -530,11 +530,16 @@ const verificarSeCadastroExiste = () => {
                     </div>
                 </div>
                 <div class="mt-6" v-if="estagioAtual === ESTAGIO_NOME">
+                    <span class="text-white block mt-1 p-2 rounded-lg">
+                        Para começar, digite seu nome
+                    </span>
                     <input v-model="pedido.nome" type="text" class="w-full px-4 py-2 text-black rounded-lg" placeholder="Digite seu nome"> 
                     <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="pedido.nome.replace(/\s/g, '').length > 0 && pedido.nome.replace(/\s/g, '').length < 6">
                         Falta(m) pelo menos mais {{ 6 - pedido.nome.replace(/\s/g, '').length }} letra(s)
                     </div>
-                    <!-- WhatsApp -->
+                    <span class="text-white block mt-1 p-2 rounded-lg">
+                        Coloque seu WhatsApp para contato no formato 5511900000000
+                    </span>
                     <input v-model="pedido.numeroTelefone" type="number" class="w-full px-4 py-2 text-black rounded-lg" placeholder="WhatsApp. Ex.: 5511900000000">
                     <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="pedido.numeroTelefone.toString().length > 0 && pedido.numeroTelefone.toString().length != 13">
                         Falta(m) mais {{ 13 - pedido.numeroTelefone.toString().length }} caractere(s)

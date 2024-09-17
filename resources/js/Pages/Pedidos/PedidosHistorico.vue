@@ -165,16 +165,16 @@ const toggleSelection = () => {
                                         #
                                         <input type="checkbox" @click="toggleSelection">
                                     </th>
-                                    <th scope="col" class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" style="min-width: 300px;" class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Cliente
                                     </th>
                                     <th scope="col" class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Total
                                     </th>
-                                    <th scope="col" class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" style="min-width: 300px;" class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Status
                                     </th>
-                                    <th scope="col" class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" style="min-width: 200px;" class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Pagamento
                                     </th>
                                     <th scope="col" class="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

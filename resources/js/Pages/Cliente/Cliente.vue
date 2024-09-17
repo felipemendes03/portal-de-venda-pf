@@ -141,7 +141,7 @@ const addAlerta = (mensagem, tipo = 'success') => {
                         class="mt-1 block w-full" />
                 </div>
                 <div>
-                    <InputLabel for="whatsapp" value="Whatsapp" />
+                    <InputLabel for="whatsapp" value="Whatsapp. Exemplo: 5511900000000" />
                     <TextInput v-whatsapp-mask id="whatsapp" ref="whatsapp" v-model="clienteSelecionado.whatsapp" type="text"
                         class="mt-1 block w-full" />
                 </div>
