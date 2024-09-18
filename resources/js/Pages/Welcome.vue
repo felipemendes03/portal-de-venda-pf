@@ -9,7 +9,7 @@ import TopMenu from './AreaCliente/TopMenu.vue';
 
 const props = defineProps({
     pedidoId: {
-        type: Number,
+        type: String,
     }
 });
 
@@ -53,7 +53,7 @@ const ESTAGIO_FORMA_PAGAMENTO = 5;
 const ESTAGIO_REVISAO = 6;
 
 const estagiosPedido = ref([
-    { id: ESTAGIO_NOME, nome: 'Nome', podeProximo: () =>  pedido.value.nome.replace(/\s/g, '').length > 5 && (!pedido.numeroTelefone || pedido.numeroTelefone.toString().length > 0 && pedido.numeroTelefone.toString().length != 11), podeVoltar: () =>  true},
+    { id: ESTAGIO_NOME, nome: 'Nome', podeProximo: () =>  pedido.value.nome.replace(/\s/g, '').length > 5 && (!pedido.value.numeroTelefone || pedido.value.numeroTelefone.toString().length === 11), podeVoltar: () =>  true},
     { id: ESTAGIO_PRODUTOS, nome: 'Escolha os itens do seu pedido', podeProximo: () =>  produtos.value.filter(produto => produto.quantidade > 0).length > 0, podeVoltar: () =>  !clienteLogado.value.nome },
     { id: ESTAGIO_OBSERVACAO, nome: 'Alguma Observação?', podeProximo: () =>  true, podeVoltar: () =>  true},
     { id: ESTAGIO_FORMA_PAGAMENTO, nome: 'Forma de pagamento', podeProximo: () =>  pedido.value.formaPagamento !== '' , podeVoltar: () =>  true},
@@ -132,7 +132,9 @@ onMounted(() => {
         }
     })
     .then(response => {
-        estagioAtual.value = ESTAGIO_PRODUTOS;
+        if(!props.pedidoId){
+            estagioAtual.value = ESTAGIO_PRODUTOS;
+        }
         clienteLogado.value = response.data;
     })
     .catch(error => {
@@ -423,6 +425,7 @@ const verificarSeCadastroExiste = () => {
                             :disabled="11 != cadastro.usuario.toString().length" @click="avancarCadastro()" 
                             :class="{ 'cursor-not-allowed bg-[#ccc]': 11 != cadastro.usuario.toString().length }"
                             class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg ">Avançar</button>
+                        <button @click="navegarEstagio(1)" class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg">Voltar</button>
 
                     </div>
                     <div v-if="estagioAtual === ESTAGIO_CADASTRO">
