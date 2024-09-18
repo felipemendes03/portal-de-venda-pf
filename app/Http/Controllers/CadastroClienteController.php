@@ -11,11 +11,11 @@ class CadastroClienteController extends Controller {
     public function login(Request $request){
 
         $request->validate([
-            'cpf' => 'required|size:14',
+            'usuario' => 'required|size:11',
             'senha' => 'required|min:6'
         ]);
 
-        $cliente = CadastroCliente::where('cpf', $request->cpf)
+        $cliente = CadastroCliente::where('usuario', $request->usuario)
             ->where('password', md5($request->senha))
             ->first();
 
@@ -28,14 +28,14 @@ class CadastroClienteController extends Controller {
             return response()->json(['token' => $jwt, 'token_type' => 'Bearer'], 200);
         }
 
-        return response()->json(['error' => 'CPF ou senha inválidos'], 401);
+        return response()->json(['error' => 'Usuário ou senha inválidos'], 401);
     }
 
     public function verificarSeExiste(Request $request){
         $request->validate([
-            'cpf' => 'required|size:14'
+            'usuario' => 'required|size:11'
         ]);
-        return response()->json(['existe' => CadastroCliente::where('cpf', $request['cpf'])->exists()], 200);
+        return response()->json(['existe' => CadastroCliente::where('usuario', $request['usuario'])->exists()], 200);
     }
 
     public function show(Request $request){
@@ -52,18 +52,18 @@ class CadastroClienteController extends Controller {
     public function store(Request $request){
         $request->validate([
             'nome' => 'required|min:6',
-            'cpf' => 'required|size:14',
+            'usuario' => 'required|size:11',
+            'whatsapp' => 'nullable|size:11',
             'senha' => 'required|min:6',
-            'whatsapp' => 'nullable|size:13'
         ]);
 
-        if(CadastroCliente::where('cpf', $request->cpf)->exists()){
-            return response()->json(['error' => 'CPF já cadastrado'], 400);
+        if(CadastroCliente::where('usuario', $request->usuario)->exists()){
+            return response()->json(['error' => 'Usuário já cadastrado'], 400);
         }
 
         $cliente = new CadastroCliente();
         $cliente->nome = $request->nome;
-        $cliente->cpf = $request->cpf;
+        $cliente->usuario = $request->usuario;
         $cliente->whatsapp = $request->whatsapp;
         $cliente->password = md5($request->senha);
         $cliente->save();

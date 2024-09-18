@@ -10,7 +10,8 @@ class CadastroCliente extends Model
     protected $table = 'cadastro_cliente';
     protected $fillable = [
         'nome',
-        'cpf',
+        'usuario',
+        'whatsapp',
         'ativo',
         'fiado',
     ];

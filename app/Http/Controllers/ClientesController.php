@@ -32,23 +32,23 @@ class ClientesController extends Controller {
     {
         $request->validate([
             'nome' => 'required',
-            'cpf' => 'required|size:14',
+            'usuario' => 'required|size:11',
             'password' => 'required|min:6',
             'ativo' => 'required',
-            'whatsapp' => 'nullable|size:13'
+            'whatsapp' => 'nullable|size:11'
         ], [
             'nome.required' => 'O nome é obrigatório.',
-            'cpf.required' => 'O CPF é obrigatório.',
-            'cpf.size' => 'O CPF deve ter 14 caracteres.',
+            'usuario.required' => 'O usuário é obrigatório.',
+            'usuario.size' => 'O usuário deve ter 11 caracteres.',
+            'whatsapp.size' => 'O WhatsApp deve ter 11 caracteres ou ser vazio.',
             'password.required' => 'A senha é obrigatória.',
             'password.min' => 'A senha deve ter no mínimo 6 caracteres.',
             'ativo.required' => 'O status ativo é obrigatório.',
-            'whatsapp.size' => 'O WhatsApp deve ter 13 caracteres ou ser vazio.',
         ]);
 
         $cliente = new CadastroCliente();
         $cliente->nome = $request->nome;
-        $cliente->cpf = $request->cpf;
+        $cliente->usuario = $request->usuario;
         $cliente->ativo = $request->ativo;
         $cliente->password = md5($request->password);
         $cliente->fiado = $request->fiado;
@@ -62,17 +62,17 @@ class ClientesController extends Controller {
     {
         $request->validate([
             'nome' => 'required',
-            'cpf' => 'required|size:14',
+            'usuario' => 'required|size:11',
             'ativo' => 'required',
             'password' => 'nullable|min:6',
-            'whatsapp' => 'nullable|size:13'
+            'whatsapp' => 'nullable|size:11'
         ], [
             'nome.required' => 'O nome é obrigatório.',
-            'cpf.required' => 'O CPF é obrigatório.',
-            'cpf.size' => 'O CPF deve ter 14 caracteres.',
+            'usuario.required' => 'O usuario é obrigatório.',
+            'usuario.size' => 'O usuario deve ter 11 caracteres.',
             'ativo.required' => 'O status ativo é obrigatório.',
             'password.min' => 'A senha deve ter no mínimo 6 caracteres.',
-            'whatsapp.size' => 'O WhatsApp deve ter 13 caracteres ou ser vazio.',
+            'whatsapp.size' => 'O WhatsApp deve ter 11 caracteres ou ser vazio.',
         ]);
 
         $cliente = CadastroCliente::find($id);
@@ -82,7 +82,7 @@ class ClientesController extends Controller {
         }
 
         $cliente->nome = $request->nome;
-        $cliente->cpf = $request->cpf;
+        $cliente->usuario = $request->usuario;
         $cliente->ativo = $request->ativo;
         $cliente->fiado = $request->fiado;
         $cliente->whatsapp = $request->whatsapp;

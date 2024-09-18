@@ -16,14 +16,18 @@ class EnviarMensagemWhatsApp{
         $chaveDaInstancia = env('API_WHATSAPP_INSTANCE_KEY');
         $url = env('API_WHATSAPP_URL') . "/message/text?key=$chaveDaInstancia";
         
-        $respose = $client->request('POST', $url, [
-            'headers' => ["Authorization" => "Bearer $token"],
-            'form_params' => [
-                'id' => $telefone,
-                'message' => $mensagem
-            ]])->getBody();
-        
-        error_log($respose);
+        try {
+            $respose = $client->request('POST', $url, [
+                'headers' => ["Authorization" => "Bearer $token"],
+                'form_params' => [
+                    'id' => "55$telefone",
+                    'message' => $mensagem
+                ]
+            ])->getBody();
+            error_log($respose);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+        }  
     }
 
 }

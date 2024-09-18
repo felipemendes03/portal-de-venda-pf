@@ -39,7 +39,7 @@ const listarClientes = () => {
 const salvarCliente = () => {
     const clienteData = {
         nome: clienteSelecionado.value.nome,
-        cpf: clienteSelecionado.value.cpf,
+        usuario: clienteSelecionado.value.usuario,
         ativo: clienteSelecionado.value.ativo,
         password: clienteSelecionado.value.password,
         whatsapp: clienteSelecionado.value.whatsapp,
@@ -89,7 +89,7 @@ const addAlerta = (mensagem, tipo = 'success') => {
                     <table class="w-full table-auto my-2">
                         <thead>
                             <tr>
-                                <th class="p-4 border border-slate-200" v-for="header in ['ID', 'Nome', 'CPF', 'Ativo']">
+                                <th class="p-4 border border-slate-200" v-for="header in ['ID', 'Nome', 'Usuário/Telefone', 'WhatsApp' ,'Ativo']">
                                     <p
                                         class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
                                         {{ header }}
@@ -107,7 +107,8 @@ const addAlerta = (mensagem, tipo = 'success') => {
                             <tr v-for="cliente in clientes" :key="cliente.id">
                                 <td class="border border-slate-200">{{ cliente.id }}</td>
                                 <td class="border border-slate-200">{{ cliente.nome }}</td>
-                                <td class="border border-slate-200">{{ cliente.cpf }}</td>
+                                <td class="border border-slate-200">{{ cliente.usuario }}</td>
+                                <td class="border border-slate-200">{{ cliente.whatsapp }}</td>
                                 <td class="border border-slate-200">{{ cliente.ativo ? "SIM" : "NÃO" }}</td>
                                 <td class="border border-slate-200">
                                     <p
@@ -136,13 +137,12 @@ const addAlerta = (mensagem, tipo = 'success') => {
                     <TextInput id="nome" ref="nome" v-model="clienteSelecionado.nome" type="text" class="mt-1 block w-full" />
                 </div>
                 <div>
-                    <InputLabel for="cpf" value="cpf" />
-                    <TextInput v-cpf-mask id="cpf" ref="cpf" v-model="clienteSelecionado.cpf" type="text"
-                        class="mt-1 block w-full" />
+                    <InputLabel for="usuario" value="Usuário/Telefone" />
+                    <TextInput id="usuario" ref="usuario" v-model="clienteSelecionado.usuario" type="number" class="mt-1 block w-full" />
                 </div>
                 <div>
-                    <InputLabel for="whatsapp" value="Whatsapp. Exemplo: 5511900000000" />
-                    <TextInput v-whatsapp-mask id="whatsapp" ref="whatsapp" v-model="clienteSelecionado.whatsapp" type="text"
+                    <InputLabel for="whatsapp" value="Whatsapp. Exemplo: 11900000000" />
+                    <TextInput id="whatsapp" ref="whatsapp" v-model="clienteSelecionado.whatsapp" type="text"
                         class="mt-1 block w-full" />
                 </div>
                 <div>

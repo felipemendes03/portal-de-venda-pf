@@ -224,7 +224,7 @@ const addAlerta = (mensagem, tipo) => {
                             </div>
                             <div>
                                 <InputLabel for="numeroWhatsApp" value="Número do WhatsApp"/>
-                                <input class="w-full" type="number" placeholder="5511900000000" name="numeroWhatsApp" id="numeroWhatsApp" v-model="pedidoForm.numeroTelefone"/>
+                                <input class="w-full" type="number" placeholder="11900000000" name="numeroWhatsApp" id="numeroWhatsApp" v-model="pedidoForm.numeroTelefone"/>
                             </div>
                             <div>
                                 <InputLabel for="formaPagamento" value="Forma de pagamento*"/>

@@ -31,7 +31,7 @@ const pedido = ref({
 
 const cadastro = ref({
     nome: '',
-    cpf: '',
+    usuario: '',
     senha: '',
     whatsapp: '',
     confirmacaoSenha: ''
@@ -53,7 +53,7 @@ const ESTAGIO_FORMA_PAGAMENTO = 5;
 const ESTAGIO_REVISAO = 6;
 
 const estagiosPedido = ref([
-    { id: ESTAGIO_NOME, nome: 'Nome', podeProximo: () =>  pedido.value.nome.replace(/\s/g, '').length > 5 && (!pedido.numeroTelefone || pedido.numeroTelefone.toString().length > 0 && pedido.numeroTelefone.toString().length != 13), podeVoltar: () =>  true},
+    { id: ESTAGIO_NOME, nome: 'Nome', podeProximo: () =>  pedido.value.nome.replace(/\s/g, '').length > 5 && (!pedido.numeroTelefone || pedido.numeroTelefone.toString().length > 0 && pedido.numeroTelefone.toString().length != 11), podeVoltar: () =>  true},
     { id: ESTAGIO_PRODUTOS, nome: 'Escolha os itens do seu pedido', podeProximo: () =>  produtos.value.filter(produto => produto.quantidade > 0).length > 0, podeVoltar: () =>  !clienteLogado.value.nome },
     { id: ESTAGIO_OBSERVACAO, nome: 'Alguma Observação?', podeProximo: () =>  true, podeVoltar: () =>  true},
     { id: ESTAGIO_FORMA_PAGAMENTO, nome: 'Forma de pagamento', podeProximo: () =>  pedido.value.formaPagamento !== '' , podeVoltar: () =>  true},
@@ -63,12 +63,17 @@ const estagiosPedido = ref([
 const podeCadastro = () => {
     return cadastro.value.nome.replace(/\s/g, '').length > 5 
         && cadastro.value.senha.replace(/\s/g, '').length > 5 
-        && !cadastro.value.whatsapp || cadastro.value.whatsapp.toString().length === 13
-        && validarCpf(cadastro.value.cpf)
+        && !cadastro.value.usuario || cadastro.value.usuario.toString().length === 11
         && (cadastro.value.senha === cadastro.value.confirmacaoSenha || showPassword.value);
 }
 
 const efetuarCadastro = () => {
+    if(cadastro.value.flagEnviarNotificacao){
+        cadastro.value.whatsapp = cadastro.value.usuario;
+    }else{
+        cadastro.value.whatsapp = null;
+    }
+
     axios.post(route('api.clientes.store'), cadastro.value)
     .then(response => {
         let token = response.data.token;
@@ -174,7 +179,7 @@ const pagarComCartao = () => {
     axios.post(route('api.sumup.checkout', {pedidoId: pedidoFeito.value.id}))
     .then(response => {
         const sumupCard = SumUpCard.mount({
-            id: 'sumup-card',
+            id: 'sumup-test',
             checkoutId: response.data.id,
             title: 'Pioneiros da Fé',
             currency: 'BRL',
@@ -308,36 +313,8 @@ const avancarCadastro = () => {
     });
 }
 
-const validarCpf = (cpf) => {
-    cpf = cpf.replace(/[^\d]+/g, '');
-
-    if (cpf.length !== 11) {
-        return false;
-    }
-
-    if (/^(\d)\1+$/.test(cpf)) {
-        return false;
-    }
-
-    let soma = 0;
-    for (let i = 0; i < 9; i++) {
-        soma += parseInt(cpf.charAt(i)) * (10 - i);
-    }
-    let resto = 11 - (soma % 11);
-    let digito1 = (resto === 10 || resto === 11) ? 0 : resto;
-
-    soma = 0;
-    for (let i = 0; i < 10; i++) {
-        soma += parseInt(cpf.charAt(i)) * (11 - i);
-    }
-    resto = 11 - (soma % 11);
-    let digito2 = (resto === 10 || resto === 11) ? 0 : resto;
-
-    return digito1 === parseInt(cpf.charAt(9)) && digito2 === parseInt(cpf.charAt(10));
-}
-
 const verificarSeCadastroExiste = () => {
-    return axios.post(route('api.clientes.verificar-castrado'), {cpf: cadastro.value.cpf})
+    return axios.post(route('api.clientes.verificar-castrado'), {usuario: cadastro.value.usuario})
     .then(response => {
         return response.data.existe;
     })
@@ -373,16 +350,16 @@ const verificarSeCadastroExiste = () => {
                 <h2 class="text-center text-white mt-4 text-lg">
                     Serviço de autoatendimento
                 </h2>
-                <div class="justify-center mt-6 bg-[#12188B] p-2" v-if="estagioAtual === 0">
-                    <div class="text-center block mt-1  mt-1 bg-blue-100 p-2 rounded-lg">
-                        Seu pedido foi realizado com sucesso!
-                    </div>
-                    <div class="text-center block mt-1  mt-1 bg-blue-100 p-2 rounded-lg text-lg">
-                        Seu número de pedido é: {{ pedidoFeito.id }}
-                    </div>
+                <div class="justify-center mt-6 p-2" v-if="estagioAtual === 0">
                     <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="pedidoFeito.tp_status=='PENDENTE_PAGAMENTO'">
-                        Para finalizar seu pedido, efetue o pagamento no valor de {{ formatarMoeda(pedidoFeito.vl_total) }} no caixa ou use a opção para pagar online. <br>
 
+                        <div class="text-center block mt-1  mt-1 p-2 rounded-lg">
+                            Seu pedido foi realizado com sucesso!
+                        </div>
+                        <div class="text-center block mt-1  mt-1 p-2 rounded-lg text-lg">
+                            Seu número de pedido é: #{{ pedidoFeito.id }}
+                        </div>
+                        Para finalizar seu pedido efetue o pagamento no valor de {{ formatarMoeda(pedidoFeito.vl_total) }} no caixa ou pague online.
                         <div v-if="pedidoFeito.tp_pagamento=='CARTAO'">
                             <button @click="pagarComCartao()" 
                                 class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg"
@@ -391,10 +368,10 @@ const verificarSeCadastroExiste = () => {
                                 >
                                 Pagar com cartão de crédito online
                             </button>
-                            <div style="background-color: blanchedalmond;" id="sumup-card"></div>
+                            <div style="background-color: blanchedalmond;" id="sumup-test"></div>
                         </div>
                         <div class="mt-4 text-center" v-else>
-                                <span class="text-lg">Para adiantar, você pode pagar via PIX para a chave pix abaixo e apresentar o comprovante no caixa.</span>
+                                <span>Para pagar por PIX use o e-mail abaixo e <b>apresente o comprovante no caixa.</b></span>
                                 <p class="bg-white text-black p-2 m-2 flex flex-row items-center justify-center rounded-lg">
                                    pioneirosdafeaps@gmail.com 
                                     <ContentCopy class="ml-2 cursor-pointer" title="Copiar chave" @click="copiarChavePix()"></ContentCopy>
@@ -402,7 +379,7 @@ const verificarSeCadastroExiste = () => {
                         </div>
                     </div>
                     <div v-else class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg">
-                        O status do seu pedido é: {{ pedidoFeito.tp_status }}
+                        O pedido #{{ pedidoFeito.id }} está {{ pedidoFeito.tp_status }}
                     </div>
                     <div class="mt-4 text-center">
                         <Link :href="route('welcome')">
@@ -418,9 +395,10 @@ const verificarSeCadastroExiste = () => {
                     </div>
                 </div>
                 <div class="mt-6" v-if="estagioAtual === ESTAGIO_INICIO">
-                    <span class="text-white">
-                        Bem vindo(a) ao nosso serviço de autoatendimento. <br>
-                        Você pode se cadastrar para acompnhar todos os seus pedidos ou fazer um pedido sem se cadastrar.
+                    <span class="text-white text-center block">
+                        Bem-vindo (a) ao nosso serviço de autoatendimento!<br><br>
+                        Escolha como realizar seu pedido: com ou sem cadastro.<br><br>
+                        Ao se cadastrar você pode acompanhar o status de preparação do seu pedido.<br><br>
                     </span>
                     <button class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg" @click="navegarEstagio(ESTAGIO_NOME)">
                         Fazer pedido sem se cadastrar
@@ -428,42 +406,35 @@ const verificarSeCadastroExiste = () => {
                     <button class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg" @click="navegarEstagio(ESTAGIO_VALIDAR_CADASTRO)">
                         Fazer cadastro/login e acompanhar pedidos
                     </button>                    
+                    <div style="padding-top: 10px;"></div>
                 </div>
                 <div class="mt-6" v-if="estagioAtual > 1 && estagioAtual < 2">
                     <span class="text-white text-center block mt-4 text-lg">
                         Faça seu cadastro para acompanhar todos os seus pedidos
                     </span>
                     <div v-if="estagioAtual === ESTAGIO_VALIDAR_CADASTRO">
-                        <span class="text-white">CPF</span>
-                        <input v-model="cadastro.cpf" 
-                            v-cpf-mask 
-                            type="text" 
-                            class="w-full px-4 py-2 text-black rounded-lg" 
-                            minlength="14"
-                            maxlength="14"
-                            placeholder="Digite seu CPF"
-                            >
-                        <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="cadastro.cpf.replace(/\s/g, '').length > 0 
-                                && !validarCpf(cadastro.cpf)">
-                            CPF inválido
+                        <span class="text-white">Número do telefone: (Ex.: 11900000000)</span>
+                        <input v-model="cadastro.usuario" type="number" name="telefone"  class="w-full px-4 py-2 text-black rounded-lg" placeholder="Digite seu número de telefone">
+                        <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" 
+                            v-if="cadastro.usuario.toString().length > 0 && cadastro.usuario.toString().length != 11">
+                            Falta(m) mais {{ 11 - cadastro.usuario.toString().length }} caractere(s)
                         </div>
-
-                        <button @click="avancarCadastro()" v-if="validarCpf(cadastro.cpf)" class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg ">Avançar</button>
+                        <button 
+                            :disabled="11 != cadastro.usuario.toString().length" @click="avancarCadastro()" 
+                            :class="{ 'cursor-not-allowed bg-[#ccc]': 11 != cadastro.usuario.toString().length }"
+                            class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg ">Avançar</button>
 
                     </div>
                     <div v-if="estagioAtual === ESTAGIO_CADASTRO">
-                        <span class="text-white block">CPF: {{ cadastro.cpf }}</span>
+                        <span class="text-white block">Telefone: {{ cadastro.usuario }}</span>
                         <span class="text-white">Nome</span>
-                        <input v-model="cadastro.nome" type="text" class="w-full px-4 py-2 text-black rounded-lg" placeholder="Digite seu nome"> 
+                        <input v-model="cadastro.nome" type="text" name="nome" class="w-full px-4 py-2 text-black rounded-lg" placeholder="Digite seu nome"> 
                         <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="cadastro.nome.replace(/\s/g, '').length > 0 && cadastro.nome.replace(/\s/g, '').length < 6">
                             Falta(m) pelo menos mais {{ 6 - cadastro.nome.replace(/\s/g, '').length }} letra(s)
                         </div>
-                        <span class="text-white">WhatsApp. Ex.: 5511900000000</span>
-                        <input v-model="cadastro.whatsapp" type="number" class="w-full px-4 py-2 text-black rounded-lg" placeholder="5511900000000"> 
-                        <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" 
-                            length="13"
-                            v-if="cadastro.whatsapp.toString().length > 0 && cadastro.whatsapp.toString().length != 13">
-                            Falta(m) mais {{ 13 - cadastro.whatsapp.toString().length }} caractere(s)
+                        <div>
+                            <input v-model="cadastro.flagEnviarNotificacao" type="checkbox" class="px-4 py-2 text-black rounded-lg mr-2">
+                            <span class="text-white">Usar número do telefone para enviar notificações sobre seu pedido?</span>
                         </div>
                         <span class="text-white">Senha</span>
                         <div class="relative w-full">
@@ -499,7 +470,7 @@ const verificarSeCadastroExiste = () => {
                         </button>
                     </div>
                     <div v-if="estagioAtual === ESTAGIO_LOGIN">
-                        <span class="text-white block">CPF: {{ cadastro.cpf }}</span>
+                        <span class="text-white block">Telefone: {{ cadastro.usuario }}</span>
                         <span class="text-white">Senha</span>
                         <div class="relative w-full">
                             <input :type="showPassword ? 'text' : 'password'" 
@@ -538,11 +509,11 @@ const verificarSeCadastroExiste = () => {
                         Falta(m) pelo menos mais {{ 6 - pedido.nome.replace(/\s/g, '').length }} letra(s)
                     </div>
                     <span class="text-white block mt-1 p-2 rounded-lg">
-                        Coloque seu WhatsApp para contato no formato 5511900000000
+                        Coloque seu WhatsApp para contato no formato 11900000000 (opcional)
                     </span>
-                    <input v-model="pedido.numeroTelefone" type="number" class="w-full px-4 py-2 text-black rounded-lg" placeholder="WhatsApp. Ex.: 5511900000000">
-                    <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="pedido.numeroTelefone.toString().length > 0 && pedido.numeroTelefone.toString().length != 13">
-                        Falta(m) mais {{ 13 - pedido.numeroTelefone.toString().length }} caractere(s)
+                    <input v-model="pedido.numeroTelefone" type="number" class="w-full px-4 py-2 text-black rounded-lg" placeholder="WhatsApp. Ex.: 11900000000">
+                    <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="pedido.numeroTelefone.toString().length > 0 && pedido.numeroTelefone.toString().length != 11">
+                        Falta(m) mais {{ 11 - pedido.numeroTelefone.toString().length }} caractere(s)
                     </div>
                 </div>
                 <div v-if="estagioAtual === ESTAGIO_PRODUTOS">
@@ -579,6 +550,9 @@ const verificarSeCadastroExiste = () => {
                         Alguma Observação?
                     </span>
                     <div v-if="temAcaiNoCopo()">
+                        <span class="text-white text-center block mt-1  mt-1 xbg-red-700 p-2 rounded-lg">
+                            Você pediu açaí! Quer adicionar alguma dessas observações?
+                        </span>
                         <div v-for="acompanhamentoAcai in obterAcompanhamentosDoAcai()">
                             <button v-if="pedido.observacao.indexOf(acompanhamentoAcai) === -1"
                              @click="addObservacaoRemoverItemDoAcaiNoCopo(acompanhamentoAcai)" 
