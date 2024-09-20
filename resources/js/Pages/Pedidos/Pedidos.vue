@@ -1,7 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
-import TextInput from '@/Components/TextInput.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
@@ -18,6 +17,7 @@ const alertObj = ref({
 const produtos=ref([]);
 const pedidoForm=ref({});
 const fluxoPedido = ref('PEDIDO');
+const enviandoPedido = ref(false)
 
 onMounted(()=>{ 
     inicializarPedido();
@@ -57,6 +57,7 @@ const finalizarPedido = ( pedido ) => {
         "itens": pedido.produtos
     }
 
+    enviandoPedido.value = true;
     axios.post(route('api.pedidos.store'), request)
     .then( (response) => {
         addAlerta("Pedido realizado com suceso!");
@@ -65,6 +66,9 @@ const finalizarPedido = ( pedido ) => {
     })
     .catch((error)=>{
         alert(error.response.data.message);
+    })
+    .finally( () => {
+        enviandoPedido.value = false;
     })
 }
 const inicializarPedido = () => {
@@ -235,7 +239,7 @@ const addAlerta = (mensagem, tipo) => {
                             <div class="my-4">
                                 <SecondaryButton @click="fluxoPedido='PEDIDO'" class="mr-2">Voltar</SecondaryButton>
                                 <PrimaryButton @click="finalizarPedido(pedidoForm)"
-                                :disabled="pedidoForm.valorPago < pedidoForm.valorTotal || !pedidoForm.formaPagamento || !pedidoForm.nomeCliente"
+                                :disabled="enviandoPedido || pedidoForm.valorPago < pedidoForm.valorTotal || !pedidoForm.formaPagamento || !pedidoForm.nomeCliente"
                                 :class="{ 'cursor-not-allowed': pedidoForm.valorPago < pedidoForm.valorTotal  || !pedidoForm.formaPagamento || !pedidoForm.nomeCliente,
                                           'bg-red-800': pedidoForm.valorPago < pedidoForm.valorTotal || !pedidoForm.formaPagamento || !pedidoForm.nomeCliente
                                  }"
