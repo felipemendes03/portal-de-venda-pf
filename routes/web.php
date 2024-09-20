@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CadastroClienteController;
+use App\Http\Controllers\ClientesController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PedidosController;
@@ -8,6 +10,7 @@ use App\Http\Controllers\ProdutosController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Security\SecurityProfileContorller;
 use App\Http\Controllers\Security\SecurityUserContorller;
+use App\Http\Controllers\SumupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -23,14 +26,34 @@ Route::get('/visitante/pedido/{id}', function (Request $request) {
     ]);
 });
 
+Route::get('/meus-pedidos', function () {
+    return Inertia::render('AreaCliente/HistoricoPedidos', [
+        
+    ]);
+})->name('meus-pedidos');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('clientes', function(){
+    return Inertia::render('Cliente/Cliente');
+})->middleware(['auth', 'verified'])->name('cliente');
+
+
 Route::get('/api/pedidos/visitante', [PedidosVisitanteController::class, 'index'])->name('api.pedidos.visitante.index');
+Route::get('/api/pedidos/visitante/historico', [PedidosVisitanteController::class, 'getHistorico'])->name('api.pedidos.visitante.historico');
 Route::get('/api/pedidos/visitante/{id}', [PedidosVisitanteController::class, 'show'])->name('api.pedidos.visitante.show');
 Route::post('/api/pedidos/visitante', [PedidosVisitanteController::class, 'store'])->name('api.pedidos.visitante.store');
 
+
+Route::post('/api/clientes/login', [CadastroClienteController::class, 'login'])->name('api.clientes.login');
+Route::post('/api/clientes/verificar', [CadastroClienteController::class, 'verificarSeExiste'])->name('api.clientes.verificar-castrado');
+Route::get('/api/clientes', [CadastroClienteController::class, 'show'])->name('api.clientes.show');
+Route::post('/api/clientes', [CadastroClienteController::class, 'store'])->name('api.clientes.store');
+
+Route::post('/api/sumup/checkout/{pedidoId}', [SumupController::class, 'gerarCheckout'])->name('api.sumup.checkout');
+Route::post('/api/sumup/confirmar-pagamento/{pedidoId}', [SumupController::class, 'confirmarPagamento'])->name('api.sumup.confirmar-pagamento');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/dashboard', [DashboardController::class, 'index'])->name('api.dashboard.index');
@@ -65,6 +88,7 @@ Route::middleware('auth')->group(function () {
     
     
     makeCrud(PedidosController::class, '/api/pedidos');
+    makeCrud(ClientesController::class, '/api/admin/clientes');
 });
 
 function makeCrud($controller, $basePath){

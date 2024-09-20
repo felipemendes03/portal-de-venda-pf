@@ -54,6 +54,7 @@ const finalizarPedido = ( pedido ) => {
         "nm_cliente": pedido.nomeCliente,
         "tp_pagamento": pedido.formaPagamento,
         "ds_observacao": pedido.observacao,
+        "nr_telefone": pedido.numeroTelefone,
         "itens": pedido.produtos
     }
 
@@ -113,59 +114,7 @@ const addAlerta = (mensagem, tipo) => {
                     </div>
                     <div class="m-2 font-semibold text-xl text-gray-800 leading-tight">Novo pedido</div>
                     <div v-show="fluxoPedido=='PEDIDO'">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
-                                        Nome do Produto
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Valor
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        nowrap>
-                                        Quantidade
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Subtotal
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="produto in produtos">
-                                    <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
-                                    <td class="px-4 text-sm text-gray-900" nowrap>{{ formatarMoeda(produto.valor) }}</td>
-                                    <td class="px-4 text-sm text-gray-900">
-                                        <input type="number" min="0" v-model="produto.quantidade" />
-                                    </td>
-                                    <td class="px-4 text-sm text-gray-900" nowrap>
-                                        {{ formatarMoeda(produto.valor * produto.quantidade) }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="3" class="px-4 text-sm text-gray-900 text-right">Total</td>
-                                    <td class="px-4 text-sm text-gray-900">
-                                        {{ formatarMoeda(calcularTotal()) }}
-                                    </td>
-                                </tr>
-                            </tfoot>
-                            
-                        </table>
-                        <div class="my-4 text-end">
-                            <PrimaryButton @click="fecharPedido(produtos)">Fechar Pedido</PrimaryButton>
-                        </div>
-                    </div>
-                    <div v-show="fluxoPedido=='PAGAMENTO'">
-                        <div class="m-2 font-semibold text-xl text-gray-800 leading-tight">Forma de pagamento</div>
-                        
-                        <div>
-                            <span>Resumo do pedido</span>
+                        <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
@@ -180,6 +129,11 @@ const addAlerta = (mensagem, tipo) => {
                                         <th scope="col"
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                             nowrap>
+                                            Estoque
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            nowrap>
                                             Quantidade
                                         </th>
                                         <th scope="col"
@@ -189,11 +143,17 @@ const addAlerta = (mensagem, tipo) => {
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="produto in pedidoForm.produtos">
+                                    <tr v-for="produto in produtos">
                                         <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
-                                        <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
-                                        <td class="px-4 text-sm text-gray-900">{{ produto.quantidade }}</td>
+                                        <td class="px-4 text-sm text-gray-900" nowrap>{{ formatarMoeda(produto.valor) }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.estoqueDisponivel }}</td>
                                         <td class="px-4 text-sm text-gray-900">
+                                            <input 
+                                            class="w-full"
+                                            type="number" min="0" :max="produto.estoqueDisponivel" 
+                                            v-model="produto.quantidade" />
+                                        </td>
+                                        <td class="px-4 text-sm text-gray-900" nowrap>
                                             {{ formatarMoeda(produto.valor * produto.quantidade) }}
                                         </td>
                                     </tr>
@@ -202,16 +162,74 @@ const addAlerta = (mensagem, tipo) => {
                                     <tr>
                                         <td colspan="3" class="px-4 text-sm text-gray-900 text-right">Total</td>
                                         <td class="px-4 text-sm text-gray-900">
-                                            {{ formatarMoeda(pedidoForm.valorTotal) }}
+                                            {{ formatarMoeda(calcularTotal()) }}
                                         </td>
                                     </tr>
                                 </tfoot>
+                                
                             </table>
+                        </div>
+                        <div class="my-4 text-end">
+                            <PrimaryButton @click="fecharPedido(produtos)">Fechar Pedido</PrimaryButton>
+                        </div>
+                    </div>
+                    <div v-show="fluxoPedido=='PAGAMENTO'">
+                        <div class="m-2 font-semibold text-xl text-gray-800 leading-tight">Forma de pagamento</div>
+                        
+                        <div>
+                            <span>Resumo do pedido</span>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col"
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
+                                                Nome do Produto
+                                            </th>
+                                            <th scope="col"
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Valor
+                                            </th>
+                                            <th scope="col"
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                nowrap>
+                                                Quantidade
+                                            </th>
+                                            <th scope="col"
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Subtotal
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr v-for="produto in pedidoForm.produtos">
+                                            <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
+                                            <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
+                                            <td class="px-4 text-sm text-gray-900">{{ produto.quantidade }}</td>
+                                            <td class="px-4 text-sm text-gray-900">
+                                                {{ formatarMoeda(produto.valor * produto.quantidade) }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="px-4 text-sm text-gray-900 text-right">Total</td>
+                                            <td class="px-4 text-sm text-gray-900">
+                                                {{ formatarMoeda(pedidoForm.valorTotal) }}
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
                         </div>
                         <div class="m-2 sm:w-1/2">
                             <div>
                                 <InputLabel for="nomeCliente" value="Nome Cliente*"/>
                                 <input class="w-full" type="text" name="nomeCliente" id="nomeCliente" v-model="pedidoForm.nomeCliente"/>
+                            </div>
+                            <div>
+                                <InputLabel for="numeroWhatsApp" value="Número do WhatsApp"/>
+                                <input class="w-full" v-mask="'(##) #####-####'" type="text" placeholder="(11) 91234-5648" name="numeroWhatsApp" id="numeroWhatsApp" v-model="pedidoForm.numeroTelefone"/>
                             </div>
                             <div>
                                 <InputLabel for="formaPagamento" value="Forma de pagamento*"/>
@@ -227,7 +245,7 @@ const addAlerta = (mensagem, tipo) => {
                                 <InputLabel for="valorPago" value="Valor pago*"/>
                                 <input class="w-full" type="number" min="0" name="valorPago" id="valorPago" v-model="pedidoForm.valorPago"/>
                             </div>
-                            <div class="my-4" v-show="pedidoForm.valorPago != pedidoForm.valorTotal">
+                            <div class="my-4">
                                 <span>Troco: {{ formatarMoeda(pedidoForm.valorPago - pedidoForm.valorTotal) }}</span>
                                 <br>
                                 <span v-if="pedidoForm.valorPago < pedidoForm.valorTotal" class="text-red-500">Valor pago menor que o total</span>

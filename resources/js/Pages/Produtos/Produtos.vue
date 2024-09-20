@@ -13,7 +13,8 @@ const produtoForm=ref({
     id:null,
     nomeProduto:null,
     valorProduto: null,
-    flagProdutoAtivo:null
+    flagProdutoAtivo:null,
+    totalEstoque:null
 });
 const alertas = ref([]);
 onMounted(()=>{ 
@@ -36,7 +37,8 @@ const cadastrarProduto = (produto) => {
         axios.put(route('produtos.update', produto.id),{
             nome: produto.nomeProduto,
             valor: produto.valorProduto,
-            ativo: produto.flagProdutoAtivo
+            ativo: produto.flagProdutoAtivo,
+            estoque: produto.totalEstoque
         })
         .then((response) =>{
             addAlerta(response.data.message);
@@ -49,7 +51,8 @@ const cadastrarProduto = (produto) => {
             id:null,
             nomeProduto:null,
             valorProduto:null,
-            flagProdutoAtivo:null     
+            flagProdutoAtivo:null,
+            totalEstoque:null 
         }
         return;
     }
@@ -57,7 +60,8 @@ const cadastrarProduto = (produto) => {
     axios.post(route('produtos.create'),{
         nome: produto.nomeProduto,
         valor: produto.valorProduto,
-        ativo: produto.flagProdutoAtivo
+        ativo: produto.flagProdutoAtivo,
+        estoque: produto.totalEstoque
     })
     .then((response) =>{
         addAlerta(response.data.message);
@@ -70,7 +74,8 @@ const cadastrarProduto = (produto) => {
         id:null,
         nomeProduto:null,
         valorProduto:null,
-        flagProdutoAtivo:null     
+        flagProdutoAtivo:null,
+        totalEstoque:null
     }
 }
 const editarProduto = (produto) => {
@@ -78,7 +83,8 @@ const editarProduto = (produto) => {
         id: produto.id,
         nomeProduto: produto.nome,
         valorProduto: produto.valor,
-        flagProdutoAtivo: produto.ativo
+        flagProdutoAtivo: produto.ativo,
+        totalEstoque: produto.estoque
     };
 }
 const addAlerta = (mensagem) => {
@@ -116,6 +122,10 @@ const addAlerta = (mensagem) => {
                             <TextInput type="number" min="0" name="valorProduto" id="valorProduto" v-model="produtoForm.valorProduto"/>
                         </div>
                         <div>
+                            <InputLabel for="totalEstoque" value="Estoque"/>
+                            <TextInput type="number" min="0" name="totalEstoque" id="totalEstoque" v-model="produtoForm.totalEstoque"/>
+                        </div>
+                        <div>
                             <InputLabel for="flagProdutoAtivo" value="Ativo"/>
                             <select name="flagProdutoAtivo" id="flagProdutoAtivo" v-model="produtoForm.flagProdutoAtivo">
                                 <option value=""></option>
@@ -131,43 +141,54 @@ const addAlerta = (mensagem) => {
                     </div>
                     <hr>
                     <div class="m-2">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        id
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
-                                        Nome do Produto
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Valor
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        nowrap>
-                                        Ativo
-                                    </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="produto in produtos">
-                                    <td class="px-4 text-sm text-gray-900">{{ produto.id }}</td>
-                                    <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
-                                    <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
-                                    <td class="px-4 text-sm text-gray-900">{{ produto.ativo == "S" ? "SIM" : "NÃO" }}</td>
-                                    <td class="px-4 text-sm text-gray-900"><PrimaryButton @click="editarProduto(produto)">editar</PrimaryButton></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>       
-
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            id
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-full">
+                                            Nome do Produto
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Valor
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Estoque
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Estoque Disponível
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            nowrap>
+                                            Ativo
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr v-for="produto in produtos">
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.id }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.nome }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ formatarMoeda(produto.valor) }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.estoque }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.estoqueDisponivel }}</td>
+                                        <td class="px-4 text-sm text-gray-900">{{ produto.ativo == "S" ? "SIM" : "NÃO" }}</td>
+                                        <td class="px-4 text-sm text-gray-900"><PrimaryButton @click="editarProduto(produto)">editar</PrimaryButton></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div> 
                 </div>
 
             </div>

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if grep -q "APP_ENV=production" .env; then
+    composer install
     npm install
     npm run build
     zip -r build.zip .

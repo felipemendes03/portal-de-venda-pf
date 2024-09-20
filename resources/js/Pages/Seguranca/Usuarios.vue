@@ -68,43 +68,45 @@ const apagarRegistro = () => {
         <div class="py-12">
             <div class="mx-2">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                   <table class="w-full table-auto my-2">
-                        <thead>
-                            <tr>
-                                <th class="p-4 border border-slate-200"
-                                    v-for="header in ['ID', 'Nome','E-mail', 'Ativo', 'Perfil']">
-                                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                                        {{ header }}
-                                    </p>
-                                </th>
-                                <th class="p-4 border border-slate-200">
-                                    <p class="flex justify-center block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
-                                        <SecondaryButton @click="cadastrarOuEditarUsuario({})">Novo</SecondaryButton>
-                                    </p>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-center">
-                            <tr v-for="user in users">
-                                <td class="border border-slate-200"> {{ user.id }}</td>
-                                <td class="border border-slate-200"> {{ user.name }}</td>
-                                <td class="border border-slate-200"> {{ user.email }}</td>
-                                <td class="border border-slate-200"> {{ user.fg_ativo == 'S' ? 'sim' : 'não' }} </td>
-                                <td class="border border-slate-200"> 
-                                    <select name="id_perfil_tb" id="id_perfil_tb" v-model="user.id_perfil" class="mt-1 block w-full" disabled>
-                                        <option value=""></option>
-                                        <option v-for="profile in profiles" :value="profile.id">{{ profile.nm_perfil }}</option>
-                                    </select>
-                                </td>
-                                <td class="border border-slate-200">
-                                    <div class="flex text-center">
-                                        <Pencil fillColor="#134e4a" title="Editar" @click="cadastrarOuEditarUsuario(user)" class="cursor-pointer border-2 p-2"/>
-                                        <Delete fillColor="#be123c" title="Apagar"  @click="apagarUsuario(user)" class="cursor-pointer border-2 ml-1 p-2"/>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody> 
-                    </table>
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto my-2">
+                                <thead>
+                                    <tr>
+                                        <th class="p-4 border border-slate-200"
+                                            v-for="header in ['ID', 'Nome','E-mail', 'Ativo', 'Perfil']">
+                                            <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                                {{ header }}
+                                            </p>
+                                        </th>
+                                        <th class="p-4 border border-slate-200">
+                                            <p class="flex justify-center block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                                <SecondaryButton @click="cadastrarOuEditarUsuario({})">Novo</SecondaryButton>
+                                            </p>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-center">
+                                    <tr v-for="user in users">
+                                        <td class="border border-slate-200"> {{ user.id }}</td>
+                                        <td class="border border-slate-200"> {{ user.name }}</td>
+                                        <td class="border border-slate-200"> {{ user.email }}</td>
+                                        <td class="border border-slate-200"> {{ user.fg_ativo == 'S' ? 'sim' : 'não' }} </td>
+                                        <td class="border border-slate-200"> 
+                                            <select name="id_perfil_tb" id="id_perfil_tb" v-model="user.id_perfil" class="mt-1 block w-full" disabled>
+                                                <option value=""></option>
+                                                <option v-for="profile in profiles" :value="profile.id">{{ profile.nm_perfil }}</option>
+                                            </select>
+                                        </td>
+                                        <td class="border border-slate-200">
+                                            <div class="flex text-center">
+                                                <Pencil fillColor="#134e4a" title="Editar" @click="cadastrarOuEditarUsuario(user)" class="cursor-pointer border-2 p-2"/>
+                                                <Delete fillColor="#be123c" title="Apagar"  @click="apagarUsuario(user)" class="cursor-pointer border-2 ml-1 p-2"/>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody> 
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

@@ -48,6 +48,11 @@ class MenuController extends Controller
                 'nome' => 'Perfis',
                 'permissoes' => ['usuarios']
             ],
+            [
+                'rota' => 'cliente',
+                'nome' => 'Clientes',
+                'permissoes' => ['cadastro.cliente']
+            ],
         ];
         $menusResponse = [];
         $usuariosService = new UsuariosService($request->user()->id_perfil);

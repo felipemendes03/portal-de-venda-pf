@@ -11,5 +11,6 @@ class Produtos extends Model
         'nome',
         'valor',
         'ativo',
+        'estoque'
     ];
 }

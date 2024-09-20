@@ -37,8 +37,8 @@ class DashboardController extends Controller
                 "produtos" => Pedido::where('tp_status', '!=', 'CANCELADO')
                     ->join('pedidos_produtos', 'pedidos.id', '=', 'pedidos_produtos.id_pedido')
                     ->join('produtos', 'pedidos_produtos.id_produto', '=', 'produtos.id')
-                    ->select('produtos.id', 'produtos.nome', \DB::raw('sum(pedidos_produtos.qt_produto) as total'))
-                    ->groupBy('produtos.id', 'produtos.nome')
+                    ->select('produtos.id', 'produtos.nome', 'produtos.estoque', \DB::raw('sum(pedidos_produtos.qt_produto) as total'))
+                    ->groupBy('produtos.id', 'produtos.nome', 'produtos.estoque')
                     ->get()
             ]
         ); 
