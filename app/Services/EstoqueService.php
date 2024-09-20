@@ -46,6 +46,6 @@ class EstoqueService{
             return $estoqueCalc->estoque - $estoqueCalc->total;
         }
            
-        return Produtos::where('id', $idProduto)->first()->estoque;
+        return Produtos::where('id', $idProduto)->first()->estoque ?? 0;
     }
 }

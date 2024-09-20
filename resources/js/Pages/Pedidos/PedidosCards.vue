@@ -54,6 +54,7 @@ const listarPedidos = () => {
 
 const proximoEstagio = (pedido) => {
     pedido.tp_status = props.nomeProximaAcao;
+    pedido.click = true
     axios.put(route('api.pedidos.update', pedido.id), pedido)
     .then((response)=>{
         listarPedidos();
@@ -93,7 +94,7 @@ const proximoEstagio = (pedido) => {
                                     </div>
                                 </div>
                                 <div class="flex justify-end mt-auto">
-                                <PrimaryButton @click="proximoEstagio(pedido)" class="w-full text-center">{{nomeBotao}}</PrimaryButton>
+                                <PrimaryButton v-show="!pedido.click" @click="proximoEstagio(pedido)" class="w-full text-center">{{nomeBotao}}</PrimaryButton>
                                 </div>
                             </div>
                         </div>
