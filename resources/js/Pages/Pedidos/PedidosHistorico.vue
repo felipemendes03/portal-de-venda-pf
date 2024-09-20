@@ -252,7 +252,7 @@ const toggleSelection = () => {
                                                     <input type="text" v-model="pedido.ds_observacao" @change="marcarModificado(pedido)" class="w-full">
                                                 </p>
                                                 <p class="text-sm text-gray-800 leading-tight"><span class="font-semibold">WhatsApp: </span>
-                                                    <input type="number" placeholder="11900000000" v-model="pedido.nr_telefone" @change="marcarModificado(pedido)" class="w-full">
+                                                    <input type="text" v-mask="'(##) #####-####'" placeholder="(11) 91234-5648" v-model="pedido.nr_telefone" @change="marcarModificado(pedido)" class="w-full">
                                                 </p>
                                                 <p class="text-sm text-gray-800 leading-tight font-semibold mt-2">Itens do Pedido:</p>
                                                 <p class="text-sm text-gray-800 leading-tight">

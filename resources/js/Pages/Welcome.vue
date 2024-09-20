@@ -13,6 +13,7 @@ const props = defineProps({
     }
 });
 
+const NUMEROS_CARACTERES_TELEFONE = 15;
 const desabilitarBotaoPagamento = ref(false);
 const podeEnviarPedido = ref(true);
 const mostrarAlertaPixCopiado = ref(false);
@@ -34,7 +35,8 @@ const cadastro = ref({
     usuario: '',
     senha: '',
     whatsapp: '',
-    confirmacaoSenha: ''
+    confirmacaoSenha: '',
+    flagEnviarNotificacao: true
 });
 
 const pedidoFeito = ref({});
@@ -53,7 +55,7 @@ const ESTAGIO_FORMA_PAGAMENTO = 5;
 const ESTAGIO_REVISAO = 6;
 
 const estagiosPedido = ref([
-    { id: ESTAGIO_NOME, nome: 'Nome', podeProximo: () =>  pedido.value.nome.replace(/\s/g, '').length > 5 && (!pedido.value.numeroTelefone || pedido.value.numeroTelefone.toString().length === 11), podeVoltar: () =>  true},
+    { id: ESTAGIO_NOME, nome: 'Nome', podeProximo: () =>  pedido.value.nome.replace(/\s/g, '').length > 5 && (!pedido.value.numeroTelefone || pedido.value.numeroTelefone.toString().length === NUMEROS_CARACTERES_TELEFONE), podeVoltar: () =>  true},
     { id: ESTAGIO_PRODUTOS, nome: 'Escolha os itens do seu pedido', podeProximo: () =>  produtos.value.filter(produto => produto.quantidade > 0).length > 0, podeVoltar: () =>  !clienteLogado.value.nome },
     { id: ESTAGIO_OBSERVACAO, nome: 'Alguma Observação?', podeProximo: () =>  true, podeVoltar: () =>  true},
     { id: ESTAGIO_FORMA_PAGAMENTO, nome: 'Forma de pagamento', podeProximo: () =>  pedido.value.formaPagamento !== '' , podeVoltar: () =>  true},
@@ -63,7 +65,7 @@ const estagiosPedido = ref([
 const podeCadastro = () => {
     return cadastro.value.nome.replace(/\s/g, '').length > 5 
         && cadastro.value.senha.replace(/\s/g, '').length > 5 
-        && !cadastro.value.usuario || cadastro.value.usuario.toString().length === 11
+        && !cadastro.value.usuario || cadastro.value.usuario.toString().length === NUMEROS_CARACTERES_TELEFONE
         && (cadastro.value.senha === cadastro.value.confirmacaoSenha || showPassword.value);
 }
 
@@ -415,15 +417,15 @@ const verificarSeCadastroExiste = () => {
                         Faça seu cadastro para acompanhar todos os seus pedidos
                     </span>
                     <div v-if="estagioAtual === ESTAGIO_VALIDAR_CADASTRO">
-                        <span class="text-white">Número do telefone: (Ex.: 11900000000)</span>
-                        <input v-model="cadastro.usuario" type="number" name="telefone"  class="w-full px-4 py-2 text-black rounded-lg" placeholder="Digite seu número de telefone">
+                        <span class="text-white">Número do telefone: (Ex.: (11) 91234-5678)</span>
+                        <input v-mask="'(##) #####-####'" v-model="cadastro.usuario" type="text" name="telefone"  class="w-full px-4 py-2 text-black rounded-lg" placeholder="Digite seu número de telefone">
                         <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" 
-                            v-if="cadastro.usuario.toString().length > 0 && cadastro.usuario.toString().length != 11">
-                            Falta(m) mais {{ 11 - cadastro.usuario.toString().length }} caractere(s)
+                            v-if="cadastro.usuario.toString().length > 0 && cadastro.usuario.toString().length != NUMEROS_CARACTERES_TELEFONE">
+                            Falta(m) mais {{ NUMEROS_CARACTERES_TELEFONE - cadastro.usuario.toString().length }} caractere(s)
                         </div>
                         <button 
-                            :disabled="11 != cadastro.usuario.toString().length" @click="avancarCadastro()" 
-                            :class="{ 'cursor-not-allowed bg-[#ccc]': 11 != cadastro.usuario.toString().length }"
+                            :disabled="NUMEROS_CARACTERES_TELEFONE != cadastro.usuario.toString().length" @click="avancarCadastro()" 
+                            :class="{ 'cursor-not-allowed bg-[#ccc]': NUMEROS_CARACTERES_TELEFONE != cadastro.usuario.toString().length }"
                             class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg ">Avançar</button>
                         <button @click="navegarEstagio(1)" class="w-full bg-[#FFD700] text-[#12183B] py-2 mt-4 rounded-lg">Voltar</button>
 
@@ -436,7 +438,9 @@ const verificarSeCadastroExiste = () => {
                             Falta(m) pelo menos mais {{ 6 - cadastro.nome.replace(/\s/g, '').length }} letra(s)
                         </div>
                         <div>
-                            <input v-model="cadastro.flagEnviarNotificacao" type="checkbox" class="px-4 py-2 text-black rounded-lg mr-2">
+                            <input v-model="cadastro.flagEnviarNotificacao" 
+                                type="checkbox" 
+                                class="px-4 py-2 rounded-lg mr-2">
                             <span class="text-white">Usar número do telefone para enviar notificações sobre seu pedido?</span>
                         </div>
                         <span class="text-white">Senha</span>
@@ -512,11 +516,11 @@ const verificarSeCadastroExiste = () => {
                         Falta(m) pelo menos mais {{ 6 - pedido.nome.replace(/\s/g, '').length }} letra(s)
                     </div>
                     <span class="text-white block mt-1 p-2 rounded-lg">
-                        Coloque seu WhatsApp para contato no formato 11900000000 (opcional)
+                        Coloque seu WhatsApp para contato no formato (11) 91234-5678 (opcional)
                     </span>
-                    <input v-model="pedido.numeroTelefone" type="number" class="w-full px-4 py-2 text-black rounded-lg" placeholder="WhatsApp. Ex.: 11900000000">
-                    <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="pedido.numeroTelefone.toString().length > 0 && pedido.numeroTelefone.toString().length != 11">
-                        Falta(m) mais {{ 11 - pedido.numeroTelefone.toString().length }} caractere(s)
+                    <input v-mask="'(##) #####-####'" v-model="pedido.numeroTelefone" type="text" class="w-full px-4 py-2 text-black rounded-lg" placeholder="WhatsApp. Ex.: (11) 91234-5678">
+                    <div class="text-white text-center block mt-1  mt-1 bg-red-700 p-2 rounded-lg" v-if="pedido.numeroTelefone.toString().length > 0 && pedido.numeroTelefone.toString().length != NUMEROS_CARACTERES_TELEFONE">
+                        Falta(m) mais {{ NUMEROS_CARACTERES_TELEFONE - pedido.numeroTelefone.toString().length }} caractere(s)
                     </div>
                 </div>
                 <div v-if="estagioAtual === ESTAGIO_PRODUTOS">

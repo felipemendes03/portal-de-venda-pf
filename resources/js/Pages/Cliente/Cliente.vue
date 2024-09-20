@@ -107,8 +107,22 @@ const addAlerta = (mensagem, tipo = 'success') => {
                             <tr v-for="cliente in clientes" :key="cliente.id">
                                 <td class="border border-slate-200">{{ cliente.id }}</td>
                                 <td class="border border-slate-200">{{ cliente.nome }}</td>
-                                <td class="border border-slate-200">{{ cliente.usuario }}</td>
-                                <td class="border border-slate-200">{{ cliente.whatsapp }}</td>
+                                <td class="border border-slate-200">
+                                    <input 
+                                    v-mask="'(##) #####-####'" 
+                                    :value="cliente.usuario"
+                                    disabled
+                                    class="border-0"
+                                    >
+                                </td>
+                                <td class="border border-slate-200">
+                                    <input 
+                                    v-mask="'(##) #####-####'" 
+                                    :value="cliente.whatsapp"
+                                    disabled
+                                    class="border-0"
+                                    >
+                                </td>
                                 <td class="border border-slate-200">{{ cliente.ativo ? "SIM" : "NÃO" }}</td>
                                 <td class="border border-slate-200">
                                     <p
@@ -138,11 +152,19 @@ const addAlerta = (mensagem, tipo = 'success') => {
                 </div>
                 <div>
                     <InputLabel for="usuario" value="Usuário/Telefone" />
-                    <TextInput id="usuario" ref="usuario" v-model="clienteSelecionado.usuario" type="number" class="mt-1 block w-full" />
+                    <TextInput 
+                        id="usuario" 
+                        ref="usuario"
+                        v-mask="'(##) #####-####'"
+                        v-model="clienteSelecionado.usuario" 
+                        type="text" class="mt-1 block w-full" />
                 </div>
                 <div>
-                    <InputLabel for="whatsapp" value="Whatsapp. Exemplo: 11900000000" />
-                    <TextInput id="whatsapp" ref="whatsapp" v-model="clienteSelecionado.whatsapp" type="text"
+                    <InputLabel for="whatsapp" value="Whatsapp. Exemplo: (11) 91234-5648" />
+                    <TextInput id="whatsapp"
+                        ref="whatsapp" v-model="clienteSelecionado.whatsapp" 
+                        type="text"
+                        v-mask="'(##) #####-####'"
                         class="mt-1 block w-full" />
                 </div>
                 <div>

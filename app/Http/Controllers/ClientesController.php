@@ -32,10 +32,10 @@ class ClientesController extends Controller {
     {
         $request->validate([
             'nome' => 'required',
-            'usuario' => 'required|size:11',
+            'usuario' => 'required|size:15',
             'password' => 'required|min:6',
             'ativo' => 'required',
-            'whatsapp' => 'nullable|size:11'
+            'whatsapp' => 'nullable|size:15'
         ], [
             'nome.required' => 'O nome é obrigatório.',
             'usuario.required' => 'O usuário é obrigatório.',
@@ -62,10 +62,10 @@ class ClientesController extends Controller {
     {
         $request->validate([
             'nome' => 'required',
-            'usuario' => 'required|size:11',
+            'usuario' => 'required|size:15',
             'ativo' => 'required',
             'password' => 'nullable|min:6',
-            'whatsapp' => 'nullable|size:11'
+            'whatsapp' => 'nullable|size:15'
         ], [
             'nome.required' => 'O nome é obrigatório.',
             'usuario.required' => 'O usuario é obrigatório.',

@@ -11,6 +11,8 @@ class EnviarMensagemWhatsApp{
             return;
         }
 
+        $telefone = preg_replace('/\D/', '', $telefone);
+
         $client = new \GuzzleHttp\Client();
         $token = env('API_WHATSAPP_TOKEN');
         $chaveDaInstancia = env('API_WHATSAPP_INSTANCE_KEY');
@@ -27,7 +29,7 @@ class EnviarMensagemWhatsApp{
             error_log($respose);
         } catch (\Exception $e) {
             error_log($e->getMessage());
-        }  
+        }
     }
 
 }

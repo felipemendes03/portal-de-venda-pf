@@ -11,7 +11,7 @@ class CadastroClienteController extends Controller {
     public function login(Request $request){
 
         $request->validate([
-            'usuario' => 'required|size:11',
+            'usuario' => 'required|size:15',
             'senha' => 'required|min:6'
         ]);
 
@@ -33,7 +33,7 @@ class CadastroClienteController extends Controller {
 
     public function verificarSeExiste(Request $request){
         $request->validate([
-            'usuario' => 'required|size:11'
+            'usuario' => 'required|size:15'
         ]);
         return response()->json(['existe' => CadastroCliente::where('usuario', $request['usuario'])->exists()], 200);
     }
@@ -52,8 +52,8 @@ class CadastroClienteController extends Controller {
     public function store(Request $request){
         $request->validate([
             'nome' => 'required|min:6',
-            'usuario' => 'required|size:11',
-            'whatsapp' => 'nullable|size:11',
+            'usuario' => 'required|size:15',
+            'whatsapp' => 'nullable|size:15',
             'senha' => 'required|min:6',
         ]);
 
